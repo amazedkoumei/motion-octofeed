@@ -1,0 +1,23 @@
+safe: true
+baseurl: /motion-octofeed
+source: ./
+destination: ./_site
+lsi: false
+pygments: true
+Markdown: kramdown
+kramdown:
+ use_coderay: true
+
+project: motion-octofeed
+name: Octofeed
+description: This is ios app for reading Github Feed. 
+
+page_list: 
+- name: Home
+  url: /
+- name: What's Github feed?
+  url: /whats_github_feed.html
+
+github:
+  url: http://guthub.com/amazedkoumei/motion-octofeed
+  repo: motion-octofeed

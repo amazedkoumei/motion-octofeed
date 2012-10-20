@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{site.name}} - Github</title>
+
+<!-- Html Header
+================================================== -->
+{% include html_header.html %}
+<!-- Analytics
+================================================== -->
+{% include analytics.html %}
+</head>
+
+<body data-spy="scroll">
+
+<!-- Navbar
+================================================== -->
+{% include navbar.html %}
+
+<!-- Subhead
+================================================== -->
+<div class="jumbotron masthead">
+  <div class="container">
+    <h1>{{site.name}}</h1>
+    <p>{{site.description}}</p>
+    <p><a href="{{site.github.url}}" class="btn btn-primary btn-large" onclick="_gaq.push(['_trackEvent', 'subhead actions', 'View on Github', 'View on Github']);">View on Github</a></p>
+    <ul class="masthead-links">
+      <li><iframe class="github-btn" src="http://ghbtns.com/github-btn.html?user=amazedkoumei&repo={{site.github.repo}}&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="100px" height="20px"></iframe></li>
+      <li><iframe class="github-btn" src="http://ghbtns.com/github-btn.html?user=amazedkoumei&repo={{site.github.repo}}&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="98px" height="20px"></iframe></li>
+    </ul>
+  </div>
+</div>
+
+<hr class="soften">
+
+<!-- Content
+================================================== -->
+<div class="container">
+
+    <div class="row">
+      <div class="span6">
+        {{content}}
+      </div>
+
+      <div class="span6">
+        <h1 id='for_developer'>for Developer</h1>
+
+        <ul>
+        <li>{{site.name}} is Written by <a href='http://www.rubymotion.com/'>RubyMotion</a>.</li>
+
+        <li>You can run {{site.name}} in your iPhone after download source code and build.</li>
+        </ul>
+        <hr />
+        <p><img alt='Alt images_article' src='images_article/top_appicon-170.png' /></p>
+      </div>
+    </div>
+</div>
+
+
+
+<!-- Footer
+================================================== -->
+{% include footer.html %}
+
+<!-- Footer Script
+================================================== -->
+{% include footer_script.html %}
+
+</body>
+</html>

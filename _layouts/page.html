@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{page.title}} | {{site.name}} - Github</title>
+<!-- Html Header
+================================================== -->
+{% include html_header.html %}
+<!-- Analytics
+================================================== -->
+{% include analytics.html %}
+</head>
+
+<body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+<!-- Navbar
+================================================== -->
+{% include navbar.html %}
+
+<!-- Subhead
+================================================== -->
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>{{page.title}} | {{site.name}}</h1>
+    <p class="lead">{{site.description}}</p>
+  </div>
+</header>
+
+<!-- Content
+================================================== -->
+<div class="container">
+  {{content}}
+</div>
+
+<!-- footer
+================================================== -->
+{% include footer.html %}
+
+<!-- Footer Script
+================================================== -->
+{% include footer_script.html %}
+
+</body>
+</html>
