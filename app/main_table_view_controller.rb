@@ -95,7 +95,7 @@ class MainTableViewController < UITableViewController
       username = App::Persistence[$USER_DEFAULTS_KEY_1] || ""
 
       @url = NSURL.alloc.initWithString("https://github.com/" + username + ".private.atom?token=" + token)
-      @feed_parser = BW::RSSParser.new(@url)
+      @feed_parser = BW::RSSParserForGithub.new(@url)
       @feed_parser.delegate = self
 
 
