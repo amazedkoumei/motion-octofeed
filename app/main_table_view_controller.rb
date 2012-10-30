@@ -2,6 +2,8 @@
 class MainTableViewController < UITableViewController
   
   def viewDidLoad()
+    super
+
     view.dataSource = view.delegate = self
     navigationItem.title = App.name
     navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
@@ -30,6 +32,7 @@ class MainTableViewController < UITableViewController
   end
 
   def viewWillAppear(animated)
+    super
     navigationController.setToolbarHidden(true, animated:false)
   end
 

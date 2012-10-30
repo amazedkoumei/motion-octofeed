@@ -4,6 +4,8 @@ class MainTableViewCellContentView < UIView
   attr_accessor :highlighted, :cell
 
   def initialize
+    super
+    
     @highlighted = false
     @cell = nil
   end

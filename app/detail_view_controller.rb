@@ -4,6 +4,8 @@ class DetailViewController < UITableViewController
   attr_accessor :item, :isHaveToRefresh
   
   def viewDidLoad()
+    super
+
     @url = item[:link]
 
     navigationItem.title = @url
@@ -47,10 +49,13 @@ class DetailViewController < UITableViewController
   end
 
   def viewWillAppear(animated)
+    super
     navigationController.setToolbarHidden(false, animated:true)
   end
 
   def viewDidAppear(animated)
+    super
+    
     @github.fetchGithubStatus do
       if @github.isGithubRepository?
         @actionItem.enabled = true

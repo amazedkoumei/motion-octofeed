@@ -17,6 +17,8 @@ class FeatureTemplateWebViewController < UIViewController
   end   
 
   def viewDidLoad()
+    super
+
     @url = url
     navigationItem.title = navTitle
     navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
@@ -50,6 +52,7 @@ class FeatureTemplateWebViewController < UIViewController
   end
   
   def viewWillAppear(animated)
+    super
     navigationController.setToolbarHidden(true, animated:true)
   end
 

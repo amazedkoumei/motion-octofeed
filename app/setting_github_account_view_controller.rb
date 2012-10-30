@@ -4,6 +4,8 @@ class SettingGithubAccountViewController < UITableViewController
   TEXT_FIELD_RECT = CGRectMake(20, 10, 280, 30)
 
   def viewDidLoad()
+    super
+    
     navigationItem.title = "GitHub Account"
 
     @saveButton = UIBarButtonItem.new.tap do |b|

@@ -14,6 +14,8 @@ class SettingListViewController < UITableViewController
   end
 
   def viewDidLoad()
+    super
+
     view.dataSource = view.delegate = self
     navigationItem.title = "Setting"
     navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
@@ -25,6 +27,8 @@ class SettingListViewController < UITableViewController
   end
 
   def viewDidAppear(animated)
+    super
+    
     @moveTo = moveTo
     if !@moveTo.nil?
       tableView(tableView, didSelectRowAtIndexPath:NSIndexPath.indexPathForRow(@moveTo, inSection:0))
