@@ -327,3 +327,6 @@ body {
     float: none;
   }
 }
+div.page p img {
+  margin: 10px;
+}
