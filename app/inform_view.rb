@@ -10,8 +10,8 @@ class InformView < UIView
       x = (App.window.frame.size.width - width) / 2
       y = (App.window.frame.size.height - height) / 2 - 50
       self.frame = CGRectMake(x , y, width, height)
-      self.backgroundColor = UIColor.blackColor
-      self.alpha = 0.8
+      self.backgroundColor = UIColor.colorWithWhite(0.0, alpha:0.5)
+      self.alpha = 1.0
       self.layer.cornerRadius = 8.0
       self.layer.masksToBounds = true
       self.clipsToBounds = true
@@ -48,10 +48,10 @@ class InformView < UIView
       UIView.beginAnimations(nil, context:context)
       UIView.setAnimationDuration(0.5)
       UIView.setAnimationDelegate(self)
-      self.alpha = 0.8
+      self.alpha = 1.0
       UIView.commitAnimations()
     else
-      self.alpha = 0.8
+      self.alpha = 1.0
     end
   end
 

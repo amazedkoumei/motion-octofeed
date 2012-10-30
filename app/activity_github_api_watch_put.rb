@@ -24,9 +24,4 @@ class ActivityGithubAPI_WatchPut < ActivityTemplateGithubApi
   def activityImage
     UIImage.imageNamed("activity_watch.png")
   end
-
-  def activityDidFinish(completed)
-    super(completed)
-    @parentViewController.isWatchingRepository = true
-  end
 end

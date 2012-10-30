@@ -24,10 +24,4 @@ class ActivityGithubAPI_StarDelete < ActivityTemplateGithubApi
   def activityImage
     UIImage.imageNamed("activity_star.png")
   end
-
-  def activityDidFinish(completed)
-    super(completed)
-    @parentViewController.isStarredRepository = false
-  end
-
 end

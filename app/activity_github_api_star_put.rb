@@ -24,9 +24,4 @@ class ActivityGithubAPI_StarPut < ActivityTemplateGithubApi
   def activityImage
     UIImage.imageNamed("activity_star.png")
   end
-
-  def activityDidFinish(completed)
-    super(completed)
-    @parentViewController.isStarredRepository = true
-  end
 end

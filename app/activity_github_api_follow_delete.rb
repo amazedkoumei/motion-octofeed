@@ -24,9 +24,4 @@ class ActivityGithubAPI_FollowDelete < ActivityTemplateGithubApi
   def activityImage
     UIImage.imageNamed("activity_follow.png")
   end
-
-  def activityDidFinish(completed)
-    super(completed)
-    @parentViewController.isFollowing = false
-  end
 end

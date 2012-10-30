@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 class MainTableViewController < UITableViewController
   
-  def viewDidLoad
+  def viewDidLoad()
     view.dataSource = view.delegate = self
     navigationItem.title = App.name
     navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
@@ -35,9 +35,9 @@ class MainTableViewController < UITableViewController
 
   def numberOfSectionsInTableView(tableView)
     if(!@parsedHash.nil?)
-      sectionCount = @parsedHash.size
+      @parsedHash.size
     else
-      sectionCount = 0
+      0
     end
   end
 
@@ -70,6 +70,7 @@ class MainTableViewController < UITableViewController
 
   def tableView(tableView, didSelectRowAtIndexPath:indexPath)
     view = DetailViewController.new.tap do |v|
+      v.initWithStyle(UITableViewStyleGrouped)
       key = @parsedHash.keys[indexPath.section]
       v.item = @parsedHash[key][indexPath.row]
     end
@@ -78,7 +79,7 @@ class MainTableViewController < UITableViewController
   end
 
   def tableView(tableView, heightForRowAtIndexPath:indexPath)
-    100
+    80
   end
 
   def tableView(tableView, titleForHeaderInSection:section)
@@ -91,8 +92,8 @@ class MainTableViewController < UITableViewController
     begin
       @informView.showWithAnimation(false)
 
-      token = App::Persistence[$USER_DEFAULTS_KEY_0] || ""
-      username = App::Persistence[$USER_DEFAULTS_KEY_1] || ""
+      token = App::Persistence[$USER_DEFAULTS_KEY_FEED_TOKEN] || ""
+      username = App::Persistence[$USER_DEFAULTS_KEY_USERNAME] || ""
 
       @url = NSURL.alloc.initWithString("https://github.com/" + username + ".private.atom?token=" + token)
       @feed_parser = BW::RSSParserForGithub.new(@url)
@@ -126,6 +127,19 @@ class MainTableViewController < UITableViewController
           feed[:date] = date
           feed[:time] = time
           
+          # url > https://secure.gravatar.com/avatar/[:fileName]?s=30&;d=[:original image url]
+          /.+?\/avatar\/(.+?)\?s=30.*/ =~ feed[:thumbnail]
+          fileName = $1 + ".png"
+          fileManager = NSFileManager.defaultManager()
+          filePath = "#{App.documents_path}/#{fileName}"
+          if !fileManager.fileExistsAtPath(filePath)
+            Dispatch::Queue.concurrent.async{
+              thumbnailData = NSData.dataWithContentsOfURL(NSURL.URLWithString(feed[:thumbnail]))
+              thumbnailData.writeToFile(filePath, atomically:false)
+            }
+          end
+
+
           hash[date] ||= begin
             Array.new
           end
@@ -155,25 +169,29 @@ class MainTableViewController < UITableViewController
   # BW::RSSParser delegate
   def when_parser_errors
     finishFetch()
-    App.alert("Bad Internet Connection or Serverside Accident. Please Retry to Pull to Refresh.")
+    App.alert($BAD_INTERNET_ACCESS_MESSAGE)
   end
 
   def hasFeedAuthInfo?
-    token = App::Persistence[$USER_DEFAULTS_KEY_0] || ""
-    username = App::Persistence[$USER_DEFAULTS_KEY_1] || ""
+    token = App::Persistence[$USER_DEFAULTS_KEY_FEED_TOKEN] || ""
+    username = App::Persistence[$USER_DEFAULTS_KEY_USERNAME] || ""
 
     (!token.empty? && !username.empty?)
   end
 
   def showGithubFeedViewController()
-    subView = SettingListViewController.new
-    subView.moveTo = subView.MOVE_TO_SETTING_GITHUB_FEED
+    subView = SettingListViewController.new.tap do |v|
+      v.moveTo = v.MOVE_TO_SETTING_GITHUB_FEED
+      v.mainTableViewContoroller = self
+    end
     view = UINavigationController.alloc.initWithRootViewController(subView)
     presentViewController(view, animated:true, completion:nil)
   end
 
   def settingButton
-    subView = SettingListViewController.new
+    subView = SettingListViewController.new.tap do |v|
+      v.mainTableViewContoroller = self
+    end
     view = UINavigationController.alloc.initWithRootViewController(subView)
     presentViewController(view, animated:true, completion:nil)
   end

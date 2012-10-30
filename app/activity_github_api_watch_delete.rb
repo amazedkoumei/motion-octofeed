@@ -24,9 +24,4 @@ class ActivityGithubAPI_WatchDelete < ActivityTemplateGithubApi
   def activityImage
     UIImage.imageNamed("activity_watch.png")
   end
-
-  def activityDidFinish(completed)
-    super(completed)
-    @parentViewController.isWatchingRepository = false
-  end
 end

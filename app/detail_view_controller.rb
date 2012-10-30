@@ -1,86 +1,193 @@
 # -*- coding: utf-8 -*-
-class DetailViewController < UIViewController
-  
-  #TODO delete url
-  attr_accessor :item, :isStarredRepository, :isWatchingRepository, :isFollowing, :isHaveToRefresh
- 
-  def viewDidLoad
-    super
+class DetailViewController < UITableViewController
 
-    @item = item
+  attr_accessor :item, :isHaveToRefresh
+  
+  def viewDidLoad()
     @url = item[:link]
 
-    navigationController.setToolbarHidden(false, animated:true)
-    #updateUrlInfo(NSURL.URLWithString(@url))
+    navigationItem.title = @url
 
-    @webview = UIWebView.new.tap do |v|
-      v.frame = self.view.bounds
-      v.loadRequest(NSURLRequest.requestWithURL(NSURL.URLWithString(@url)))
-      v.scalesPageToFit = true;
-      v.delegate = self
-      view.addSubview(v)
+    @github = Github.new(NSURL.URLWithString(@url))
+    @github.fetchGithubStatus do
+      if @github.isGithubRepository?
+        @actionItem.enabled = true
+      end
     end
+    navigationItem.title = "#{@github.userName}/#{@github.repositoryName}"
+
 
     @toolbarItems = Array.new.tap do |a|
-      @backItem = UIBarButtonItem.alloc.initWithBarButtonSystemItem(101, target:@webview, action:'goBack')
-      @forwardItem = UIBarButtonItem.alloc.initWithBarButtonSystemItem(102, target:@webview, action:'goForward')
-      @reloadItem = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemRefresh, target:@webview, action:'reload')
       @actionItem = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAction, target:self, action:'actionButton')
-      @readmeItem = UIBarButtonItem.alloc.initWithTitle("README", style:UIBarButtonItemStyleBordered, target:self, action:'readmeButton')
+      @actionItem.enabled = false
       @flexibleSpace = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemFlexibleSpace, target:nil, action:nil)
-      if !isGithubRepository?
+      if !@github.isGithubRepository?
         @actionItem.enabled = false
-        @readmeItem.enabled = false
       end
 
-      a<<@backItem
-      a<<@flexibleSpace
-      a<<@forwardItem
-      a<<@flexibleSpace
-      a<<@reloadItem
       a<<@flexibleSpace
       a<<@actionItem
-      a<<@flexibleSpace
-      a<<@readmeItem
 
       self.toolbarItems = a
     end
 
-    @tabbar = UITabBar.new.tap do |t|
-      view.addSubview(t)
+    @profileViewController = FeatureProfileViewController.new.tap do |v|
+      v.url = "https://" + @github.host + "/" + @github.userName
+      v.navTitle = "#{@github.userName}"
+      v.hideDoneButton = true
+      v.parseBeforeDidLoad()
+    end
+
+    @readmeViewController = FeatureReadmeViewController.new.tap do |v|
+      v.url = "https://" + @github.host + "/" + @github.userName + "/" + @github.repositoryName
+      v.navTitle = "#{@github.userName}/#{@github.repositoryName}"
+      v.hideDoneButton = true
+      v.parseBeforeDidLoad()
     end
   end
-  
+
+  def viewWillAppear(animated)
+    navigationController.setToolbarHidden(false, animated:true)
+  end
+
   def viewDidAppear(animated)
-    if @isHaveToRefresh
-      updateUrlInfo(@webview.request.URL)
-      @isHaveToRefresh = false
+    @github.fetchGithubStatus do
+      if @github.isGithubRepository?
+        @actionItem.enabled = true
+      end
+    end
+  end
+
+  def numberOfSectionsInTableView(tableView)
+    2
+  end
+
+  def tableView(tableView, numberOfRowsInSection:section)
+    case section
+      when 0
+        0
+      when 1
+        2
+    end
+  end
+
+  def tableView(tableView, titleForHeaderInSection:section)
+    case section
+      when 0
+        "URL"
+      when 1
+        "info"
+    end
+  end
+
+  def tableView(tableView, viewForFooterInSection:section)
+    if section == 0
+      view = UIView.new.tap do |v|
+        label = UILabel.new.tap do |l|
+          l.frame = CGRectMake(20, 0, 280, 10)
+          l.backgroundColor = UIColor.clearColor
+          l.textAlignment = UITextAlignmentLeft
+          l.textColor = UIColor.blueColor
+          l.lineBreakMode = UILineBreakModeCharacterWrap
+          l.numberOfLines = 0
+          l.font = UIFont.boldSystemFontOfSize(16)
+          l.shadowColor = UIColor.whiteColor
+          l.shadowOffset = CGSizeMake(0, 1);
+          l.text = @url
+          l.when_tapped do
+            view = WebViewController.new.tap do |v|
+              v.item = @item
+              navigationController.pushViewController(v, animated:true)
+            end
+          end
+          l.sizeToFit()
+        end
+        v.addSubview(label)
+      end
+    end
+  end
+
+  def tableView(tableView, heightForFooterInSection:section)
+    if section == 0
+      70
+    else
+      # default height
+      -1
+    end
+  end
+
+  CELLID = "detailmenu"
+  def tableView(tableView, cellForRowAtIndexPath:indexPath)
+    cell = tableView.dequeueReusableCellWithIdentifier(CELLID) || begin
+      cell = UITableViewCell.new.tap do |c|
+        c.initWithStyle(UITableViewCellStyleValue1, reuseIdentifier:CELLID)
+        c.selectionStyle = UITableViewCellSelectionStyleBlue
+        c.accessoryType = UITableViewCellAccessoryDisclosureIndicator
+      end
+    end
+
+    case indexPath.section
+      when 1
+        # info section
+        case indexPath.row
+          when 0
+            cell.textLabel.text = "Owner"
+            if @github.isGithubRepositoryOrUser?
+              cell.detailTextLabel.text = @userName
+            else
+              cell.textColor = UIColor.grayColor
+              cell.accessoryType = UITableViewCellAccessoryNone
+              cell.userInteractionEnabled = false
+            end
+          when 1
+            cell.textLabel.text = "README"
+            if @github.isGithubRepository?
+              cell.detailTextLabel.text = @repositoryName
+            else
+              cell.textColor = UIColor.grayColor
+              cell.accessoryType = UITableViewCellAccessoryNone
+              cell.userInteractionEnabled = false
+            end
+        end
+    end
+    cell
+  end
+
+  def tableView(tableView, didSelectRowAtIndexPath:indexPath)
+    case indexPath.section
+      when 1
+        # info section
+        case indexPath.row
+          when 0
+            view = @profileViewController
+          when 1
+            view = @readmeViewController
+        end
+        navigationController.pushViewController(view, animated:true)
+        tableView.deselectRowAtIndexPath(indexPath, animated:false)
     end
   end
 
   def actionButton
-    # TODO
-    shareURL = NSURL.URLWithString(@url)
-    activityItems = [shareURL, navigationController.topViewController];
+    activityItems = [NSURL.URLWithString(@url), navigationController.topViewController];
 
     includeActivities = Array.new.tap do |arr|
-      arr<<ActivityViewInSafari.new
-      if isGithubRepository?
-        if @isStarredRepository
+      if @github.isGithubRepository?
+        if @github.isStarredRepository?
           arr<<ActivityGithubAPI_StarDelete.new
         else
           arr<<ActivityGithubAPI_StarPut.new
         end
 
-        if @isWatchingRepository
+        if @github.isWatchingRepository?
           arr<<ActivityGithubAPI_WatchDelete.new
         else
           arr<<ActivityGithubAPI_WatchPut.new
         end
       end
 
-      if isGithubRepositoryOrUser?
-        if @isFollowing
+      if @github.isGithubRepositoryOrUser?
+        if @github.isFollowingUser?
           arr<<ActivityGithubAPI_FollowDelete.new
         else
           arr<<ActivityGithubAPI_FollowPut.new
@@ -93,6 +200,7 @@ class DetailViewController < UIViewController
       UIActivityTypePostToTwitter,
       UIActivityTypePostToWeibo,
       UIActivityTypeMessage,
+      UIActivityTypeMail,
       UIActivityTypePrint,
       UIActivityTypeCopyToPasteboard,
       UIActivityTypeAssignToContact,
@@ -105,85 +213,11 @@ class DetailViewController < UIViewController
     presentViewController(@activityController, animated:true, completion:nil)
   end
 
-  def readmeButton
-    url = "https://" + @host + "/" + @userName + "/" + @repositoryName
-    @readmeView = ReadmeViewController.new.tap do |v|
-      v.url = url
-      v.navTitle = "#{@userName}/#{@repositoryName}"
-    end
-    navigationView = UINavigationController.alloc.initWithRootViewController(@readmeView)
-    presentViewController(navigationView, animated:true, completion:nil)
-  end
-
-  # UIWebViewDelegate
-  def webViewDidStartLoad(webView)
-    UIApplication.sharedApplication.networkActivityIndicatorVisible = true
-  end
-
-  # UIWebViewDelegate
-  def webViewDidFinishLoad(webView)
-    UIApplication.sharedApplication.networkActivityIndicatorVisible = false
-    updateUrlInfo(webView.request.URL)
-
-    @backItem.enabled = webView.canGoBack
-    @forwardItem.enabled = webView.canGoForward
-  end
-
-  # UIWebViewDelegate
-  def webView(webView, didFailLoadWithError:error)
-    webViewDidFinishLoad(webView)
-  end
-
-  def updateUrlInfo(url)
-    puts "updateUrlInfo: #{url.to_s}"
-    @url = url.absoluteString
-    @host = url.host
-    @path = url.path
-    puts "url:#{@url} host: #{@host} path: #{@path}"
-    blank, @userName, @repositoryName = @path.componentsSeparatedByString("/")
-    navigationItem.title = "#{@userName.to_s}/#{@repositoryName.to_s}"
-
-    # FIXME: Too dirty
-    if isGithubRepository?
-      @fetchPath = "/user/starred/" + @userName + "/" + @repositoryName
-      fetchGithubStatus{|response| @isStarredRepository = response.status_code == 204}
-
-      @fetchPath = "/user/subscriptions/" + @userName + "/" + @repositoryName
-      fetchGithubStatus{|response| @isWatchingRepository = response.status_code == 204}
-      @readmeItem.enabled = true
-    else
-      @readmeItem.enabled = false
-    end
-
-    if isGithubRepositoryOrUser?
-      @fetchPath = "/user/following/" + @userName
-      fetchGithubStatus{|response| @isFollowing = response.status_code == 204}
-    end
-
-    # TODO: this is bad becouse fetchGithubStatus uses async call
-    @actionItem.enabled = true
-  end
-
-  def isGithubRepository?
-    (@host == "github.com" && @userName != nil && @repositoryName != nil)
-  end
-
-  def isGithubUser?
-    (@host == "github.com" && @userName != nil && @repositoryName == nil)
-  end
-
-  def isGithubRepositoryOrUser?
-    (@host == "github.com" && @userName != nil)
-  end
-
-  def fetchGithubStatus(&block)
-    token = App::Persistence[$USER_DEFAULTS_KEY_GITHUB_API_TOKEN]
-    if(!token.nil?)
-      url = "https://api.github.com" + @fetchPath
-      authStr = token
-      authHeader = "token " + authStr
-      BW::HTTP.get(url, {headers: {Authorization: authHeader}}) do |response|
-        block.call(response)
+  def completePerformActivity()
+    @actionItem.enabled = false
+    @github.fetchGithubStatus do
+      if @github.isGithubRepository?
+        @actionItem.enabled = true
       end
     end
   end

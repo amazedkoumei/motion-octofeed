@@ -46,8 +46,8 @@ class ActivityTemplateGithubApi < UIActivity
           blank, @userName, @repositoryName = @url.path.componentsSeparatedByString("/")
         end
 
-      elsif item.class.name == "DetailViewController"
-
+      # FIXME: Too bad. This if-state should be "ancestors contains UIViewController"
+      elsif item.class.name == "DetailViewController" || item.class.name == "WebViewController"
         @parentViewController = item
         @informView = InformView.new.tap do |v|
           v.message = informationMessage()
@@ -55,21 +55,27 @@ class ActivityTemplateGithubApi < UIActivity
         @parentViewController.navigationController.view.addSubview(@informView)
 
       else
-        puts "class name: " + item.class.name
+        # do nothing
+        # puts "class name: " + item.class.name
       end
     end
   end
 
   def performActivity()
     @informView.showWithAnimation(false)
-    #App::Persistence[$USER_DEFAULTS_KEY_GITHUB_API_TOKEN] = nil
-    authHeader = "token " + (App::Persistence[$USER_DEFAULTS_KEY_GITHUB_API_TOKEN] || "")
+    authHeader = "token " + (App::Persistence[$USER_DEFAULTS_KEY_API_TOKEN] || "")
+
+    # dismiss ActionSheet
     activityDidFinish(true)
+
     BW::HTTP.send(methodName, apiUrl, {headers: {Authorization: authHeader}}) do |response|
       if response.status_code == 204
         # success
         @informView.hideWithAnimation(true)
-        App.alert("OK")
+        if !@parentViewController.methods.index(:completePerformActivity).nil?
+          @parentViewController.completePerformActivity()
+        end
+        App.alert("Success")
       elsif response.status_code == 401
         # auth error
         @informView.hideWithAnimation(true)
@@ -91,6 +97,6 @@ class ActivityTemplateGithubApi < UIActivity
     subView.moveTo = subView.MOVE_TO_SETTING_GITHUB_ACCOUNT
     view = UINavigationController.alloc.initWithRootViewController(subView)
     @parentViewController.isHaveToRefresh = true
-    @parentViewController.presentViewController(view, animated:true, completion:lambda{puts "hoge"})
+    @parentViewController.presentViewController(view, animated:true, completion:nil)
   end
 end

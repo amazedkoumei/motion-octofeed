@@ -24,9 +24,4 @@ class ActivityGithubAPI_FollowPut < ActivityTemplateGithubApi
   def activityImage
     UIImage.imageNamed("activity_follow.png")
   end
-
-  def activityDidFinish(completed)
-    super(completed)
-    @parentViewController.isFollowing = true
-  end
 end

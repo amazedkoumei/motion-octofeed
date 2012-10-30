@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 class SettingListViewController < UITableViewController
 
-  attr_accessor :moveTo
+  attr_accessor :moveTo, :mainTableViewContoroller
 
   # FIXME: How to write Ruby's Constant
   def MOVE_TO_SETTING_GITHUB_FEED
@@ -13,13 +13,13 @@ class SettingListViewController < UITableViewController
     1
   end
 
-  def viewDidLoad
+  def viewDidLoad()
     view.dataSource = view.delegate = self
     navigationItem.title = "Setting"
     navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
 
     @doneButton = UIBarButtonItem.new.tap do |b|
-      b.initWithBarButtonSystemItem(UIBarButtonSystemItemDone, target:self, action:"doneButton")
+      b.initWithTitle("done", style:UIBarButtonItemStylePlain, target:self, action:"doneButton")
       navigationItem.rightBarButtonItem = b
     end
   end
@@ -57,10 +57,6 @@ class SettingListViewController < UITableViewController
     if(indexPath.row < menus.count)
       case indexPath.row
         when 0
-          @detail_controller = SettingGithubFeedViewController.new.tap do |v|
-            v.initWithStyle(UITableViewStyleGrouped)
-          end
-        when 1
           @detail_controller = SettingGithubAccountViewController.new.tap do |v|
             v.initWithStyle(UITableViewStyleGrouped)
           end
@@ -73,12 +69,12 @@ class SettingListViewController < UITableViewController
 
   def menus
     @menus = [
-      "Github Feed URL",
       "Github Account"
     ]
   end
 
   def doneButton
+    mainTableViewContoroller.fetchFeed()
     dismissViewControllerAnimated(true, completion:nil)
   end
 end
