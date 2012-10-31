@@ -27,51 +27,20 @@ This is ios app for reading Github news feed written in [Rubymotion](http://www.
 インストール / Install
 ----------
 ### ja
-1. [BubbleWrap](https://github.com/rubymotion/BubbleWrap) をインストールしてください。 (*1 参照)
-2. ルートディレクトリにRakefileを追加してください。 (*2 参照)
-3. ビルドを実行してください。ビルド手順についてはrubymotion.jpの[Welcome to RubyMotion](http://rubymotion.jp/RubyMotionDocumentation/guides/getting-started/index.html)をご覧ください。
+1. [Bundler](http://gembundler.com) をインストールしてください。 (*1 参照)
+2. ビルドを実行してください。ビルド手順についてはrubymotion.jpの[Welcome to RubyMotion](http://rubymotion.jp/RubyMotionDocumentation/guides/getting-started/index.html)をご覧ください。
 
     
 ### en
-1. Install [BubbleWrap](https://github.com/rubymotion/BubbleWrap) (watch *1 bellow)
-2. Add "Rakefile" to root directory. (watch *2 bellow)
-3. do build. if you'd like to know how to build, watch [Welcome to RubyMotion](http://www.rubymotion.com/developer-center/guides/getting-started/) on rubymotion.com
+1. Install [Bundler](http://gembundler.com) (watch *1 bellow)
+2. do build. if you'd like to know how to build, watch [Welcome to RubyMotion](http://www.rubymotion.com/developer-center/guides/getting-started/) on rubymotion.com
 
 
-#### *1 Install BubbleWrap
-    gem install bubble-wrap
+#### *1 Install Bundler
+```
+gem install bundler
+```
 
-
-#### *2 Rakefile
-	# -*- coding: utf-8 -*-
-	$:.unshift("/Library/RubyMotion/lib")
-	require 'motion/project'
-
-	require 'bubble-wrap'
-	require 'bubble-wrap/all'
-
-	version = '1.0'
-	Motion::Project::App.setup do |app|
-  		# Use `rake config' to see complete project settings.
-  		app.name = "Octofeed"
-  		app.version = version
-  		app.frameworks<<"MessageUI"
-  		app.sdk_version = "6.0"
-  		app.deployment_target = "6.0"
-  		app.device_family = [:iphone]
-  		app.interface_orientations = [:portrait]
-  		app.icons = ["iTunesArtwork.png", "Icon.png", "Icon@2x.png", "Icon-72.png", "Icon-Small.png", "Icon-Small-50.png", "Icon-Small@2x.png","Default.png"]
-  		app.prerendered_icon = false
-  		app.files_dependencies 'app/activity_github_api_star_put.rb' => 'app/activity_template_github_api.rb'
-  		app.files_dependencies 'app/activity_github_api_star_delete.rb' => 'app/activity_template_github_api.rb'
-  		app.files_dependencies 'app/activity_github_api_follow_put.rb' => 'app/activity_template_github_api.rb'
-  		app.files_dependencies 'app/activity_github_api_follow_delete.rb' => 'app/activity_template_github_api.rb'
-  		app.files_dependencies 'app/activity_github_api_watch_put.rb' => 'app/activity_template_github_api.rb'
-		app.files_dependencies 'app/activity_github_api_watch_delete.rb' => 'app/activity_template_github_api.rb'
-		app.files_dependencies 'app/feature_profile_view_controller.rb' => 'app/feature_template_webview_controller.rb'
-		app.files_dependencies 'app/feature_readme_view_controller.rb' => 'app/feature_template_webview_controller.rb'
-	end
- 
 
 スクリーンショット / Screenshot
 ----------
