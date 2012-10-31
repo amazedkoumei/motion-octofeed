@@ -48,7 +48,7 @@ $ gem install bundler
 $ bundle install
 ```
 
-or if you want to manager your gems per project, use command below
+or if you want to manage your gems per project, use command below
 
 ```
 $ bundle install --path bundle
