@@ -1,9 +1,10 @@
 .repl_history
 build
 vendor
-Rakefile
 LiveScratchpad.rb
 app/testflight_launcher.rb
 resources/*.nib
 resources/*.momd
 resources/*.storyboardc
+.bundle/
+bundle/
