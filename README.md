@@ -28,19 +28,31 @@ This is ios app for reading Github news feed written in [Rubymotion](http://www.
 ----------
 ### ja
 1. [Bundler](http://gembundler.com) をインストールしてください。 (*1 参照)
-2. ビルドを実行してください。ビルド手順についてはrubymotion.jpの[Welcome to RubyMotion](http://rubymotion.jp/RubyMotionDocumentation/guides/getting-started/index.html)をご覧ください。
+2. bundler で必要な gem をインストールしてください。(*2 参照)
+3. ビルドを実行してください。ビルド手順についてはrubymotion.jpの[Welcome to RubyMotion](http://rubymotion.jp/RubyMotionDocumentation/guides/getting-started/index.html)をご覧ください。
 
     
 ### en
-1. Install [Bundler](http://gembundler.com) (watch *1 bellow)
-2. do build. if you'd like to know how to build, watch [Welcome to RubyMotion](http://www.rubymotion.com/developer-center/guides/getting-started/) on rubymotion.com
+1. Install [Bundler](http://gembundler.com) (watch *1 below)
+2. Install gems with bundler. (watch *2 below)
+3. do build. if you'd like to know how to build, watch [Welcome to RubyMotion](http://www.rubymotion.com/developer-center/guides/getting-started/) on rubymotion.com
 
 
 #### *1 Install Bundler
 ```
-gem install bundler
+$ gem install bundler
 ```
 
+#### *2 Install gems
+```
+$ bundle install
+```
+
+or if you want to manager your gems per project, use command below
+
+```
+$ bundle install --path bundle
+```
 
 スクリーンショット / Screenshot
 ----------
