@@ -23,9 +23,13 @@ This is ios app for reading Github news feed written in [Rubymotion](http://www.
 - readable view of readme and repository owner's profile
 
 
+要件 / Requirements
+----------
+ruby-prof requires Ruby 1.9.1 and higher.
 
 インストール / Install
 ----------
+
 ### ja
 1. [Bundler](http://gembundler.com) をインストールしてください。 (*1 参照)
 2. bundler で必要な gem をインストールしてください。(*2 参照)
