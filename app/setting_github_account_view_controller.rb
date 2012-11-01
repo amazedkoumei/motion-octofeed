@@ -83,13 +83,7 @@ class SettingGithubAccountViewController < UITableViewController
   end
 
   def saveButton
-    @informView.message = "user authenticated."
-    @informView.setNeedsDisplay()
-    @informView.showWithAnimation(true)
-
-    @saveButton.enabled = false
-    navigationItem.hidesBackButton = true
-
+    
     @userName = @userNameField.text || ""
     @password = @passwordField.text || ""
 
@@ -98,6 +92,13 @@ class SettingGithubAccountViewController < UITableViewController
       @saveButton.enabled = true
       return
     end
+
+    @informView.message = "user authenticated."
+    @informView.setNeedsDisplay()
+    @informView.showWithAnimation(true)
+
+    @saveButton.enabled = false
+    navigationItem.hidesBackButton = true
 
     App::Persistence[$USER_DEFAULTS_KEY_USERNAME] = @userName
     # base64 encoding
