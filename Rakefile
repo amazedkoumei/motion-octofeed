@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 $:.unshift("/Library/RubyMotion/lib")
 require 'motion/project'
+require 'motion-testflight'
 require 'bundler/setup'
 require 'yaml'
 
