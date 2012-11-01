@@ -29,6 +29,8 @@ Motion::Project::App.setup do |app|
 
   if File.exists?('./config.yml')
     config = YAML::load_file('./config.yml')
+
+    app.identifier = config['identifier']
     app.development do
       app.codesign_certificate = config['development']['certificate']
       app.provisioning_profile = config['development']['provisioning']
@@ -45,6 +47,5 @@ Motion::Project::App.setup do |app|
       app.provisioning_profile = config['release']['provisioning']
       app.seed_id = config['release']['seed_id']
     end
-
   end
 end
