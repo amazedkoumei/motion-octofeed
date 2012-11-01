@@ -3,7 +3,6 @@ $:.unshift("/Library/RubyMotion/lib")
 require 'motion/project'
 require 'bundler/setup'
 require 'yaml'
-require 'motion-testflight'
 
 Bundler.require
 
