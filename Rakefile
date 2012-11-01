@@ -2,6 +2,9 @@
 $:.unshift("/Library/RubyMotion/lib")
 require 'motion/project'
 require 'bundler/setup'
+require 'yaml'
+require 'motion-testflight'
+
 Bundler.require
 
 Motion::Project::App.setup do |app|
@@ -23,4 +26,25 @@ Motion::Project::App.setup do |app|
   app.files_dependencies 'app/activity_github_api_watch_delete.rb' => 'app/activity_template_github_api.rb'
   app.files_dependencies 'app/feature_profile_view_controller.rb' => 'app/feature_template_webview_controller.rb'
   app.files_dependencies 'app/feature_readme_view_controller.rb' => 'app/feature_template_webview_controller.rb'
+
+  if File.exists?('./config.yml')
+    config = YAML::load_file('./config.yml')
+    app.development do
+      app.codesign_certificate = config['development']['certificate']
+      app.provisioning_profile = config['development']['provisioning']
+
+      app.testflight.sdk = 'vendor/TestFlight'
+      app.testflight.api_token = config['testflight']['api_token']
+      app.testflight.team_token = config['testflight']['team_token']
+      if config['testflight']['provisioning']
+        app.provisioning_profile = config['testflight']['provisioning']
+      end
+    end
+    app.release do
+      app.codesign_certificate = config['release']['certificate']
+      app.provisioning_profile = config['release']['provisioning']
+      app.seed_id = config['release']['seed_id']
+    end
+
+  end
 end
