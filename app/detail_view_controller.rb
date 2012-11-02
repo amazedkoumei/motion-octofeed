@@ -11,11 +11,6 @@ class DetailViewController < UITableViewController
     navigationItem.title = @url
 
     @github = Github.new(NSURL.URLWithString(@url))
-    @github.fetchGithubStatus do
-      if @github.isGithubRepository?
-        @actionItem.enabled = true
-      end
-    end
     navigationItem.title = "#{@github.userName}/#{@github.repositoryName}"
 
 
@@ -23,7 +18,7 @@ class DetailViewController < UITableViewController
       @actionItem = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAction, target:self, action:'actionButton')
       @actionItem.enabled = false
       @flexibleSpace = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemFlexibleSpace, target:nil, action:nil)
-      if !@github.isGithubRepository?
+      if !@github.isGithubRepositoryOrUser?
         @actionItem.enabled = false
       end
 
@@ -48,19 +43,20 @@ class DetailViewController < UITableViewController
     end
   end
 
-  def viewWillAppear(animated)
-    super
-    navigationController.setToolbarHidden(false, animated:true)
-  end
-
   def viewDidAppear(animated)
     super
+    navigationController.setToolbarHidden(false, animated:animated)
     
     @github.fetchGithubStatus do
-      if @github.isGithubRepository?
+      if @github.isGithubRepositoryOrUser?
         @actionItem.enabled = true
       end
     end
+  end
+
+  def viewWillDisappear(animated)
+    super
+    navigationController.setToolbarHidden(true, animated:animated)
   end
 
   def numberOfSectionsInTableView(tableView)
@@ -221,7 +217,7 @@ class DetailViewController < UITableViewController
   def completePerformActivity()
     @actionItem.enabled = false
     @github.fetchGithubStatus do
-      if @github.isGithubRepository?
+      if @github.isGithubRepositoryOrUser?
         @actionItem.enabled = true
       end
     end

@@ -60,18 +60,19 @@ class WebViewController < UIViewController
     end
   end
   
-  def viewWillAppear(animated)
-    super
-    navigationController.setToolbarHidden(false, animated:true)
-  end
-
   def viewDidAppear(animated)
     super
+    navigationController.setToolbarHidden(false, animated:animated)
     
     if @isHaveToRefresh
       githubStatusUpdate()
       @isHaveToRefresh = false
     end
+  end
+
+  def viewWillDisappear(animated)
+    super
+    navigationController.setToolbarHidden(true, animated:animated)
   end
 
   def actionButton

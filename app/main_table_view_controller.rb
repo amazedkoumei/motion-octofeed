@@ -31,11 +31,6 @@ class MainTableViewController < UITableViewController
     end
   end
 
-  def viewWillAppear(animated)
-    super
-    navigationController.setToolbarHidden(true, animated:false)
-  end
-
   def numberOfSectionsInTableView(tableView)
     if(!@parsedHash.nil?)
       @parsedHash.size
