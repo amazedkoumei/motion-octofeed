@@ -67,12 +67,21 @@ class MainTableViewController < UITableViewController
   end
 
   def tableView(tableView, didSelectRowAtIndexPath:indexPath)
-    view = DetailViewController.new.tap do |v|
+    # App will crash if @detailView release before "@github.fetchGithubStatus" callend in DetailViewController have not finished
+    @detailViewStack ||= []
+    if @detailViewStack.size < 5
+      @detailViewStack << @detailView
+    else
+      @detailViewStack = []
+      @detailViewStack << @detailView
+    end
+
+    @detailView = DetailViewController.new.tap do |v|
       v.initWithStyle(UITableViewStyleGrouped)
       key = @parsedHash.keys[indexPath.section]
       v.item = @parsedHash[key][indexPath.row]
     end
-    navigationController.pushViewController(view, animated:true)
+    navigationController.pushViewController(@detailView, animated:true)
     tableView.deselectRowAtIndexPath(indexPath, animated:false)
   end
 

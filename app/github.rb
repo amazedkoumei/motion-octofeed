@@ -26,6 +26,9 @@ class Github
   def fetchGithubStatus(&block)
     token = App::Persistence[$USER_DEFAULTS_KEY_API_TOKEN]
     if(!token.nil?)
+      # init @statusHash:fetched
+      @statusHash.each_value {|val| val[:fetched] = false}
+      
       for key, val in @statusHash
         url = val[:apiURL]
         authHeader = "token " + token
