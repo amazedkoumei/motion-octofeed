@@ -15,11 +15,11 @@ class DetailViewController < UITableViewController
 
 
     @toolbarItems = Array.new.tap do |a|
-      @actionItem = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAction, target:self, action:'actionButton')
-      @flexibleSpace = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemFlexibleSpace, target:nil, action:nil)
-      if !@github.isGithubRepositoryOrUser?
-        @actionItem.enabled = false
+      @actionItem = UIBarButtonItem.new.tap do |i|
+        i.initWithBarButtonSystemItem(UIBarButtonSystemItemAction, target:self, action:'actionButton')
+        i.enabled = false
       end
+      @flexibleSpace = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemFlexibleSpace, target:nil, action:nil)
 
       a<<@flexibleSpace
       a<<@actionItem
