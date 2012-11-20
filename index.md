@@ -18,7 +18,7 @@ permalink: /
 ---
 
 #### Download
-* Now waiting review in App Store.
+* Please download from [App Store](http://click.linksynergy.com/fs-bin/click?id=khRM7eIZQnI&subid=0&offerid=94348.1&type=10&tmpid=3910&RD_PARM0=https%3A%2F%2Fitunes.apple.com%2Fjp%2Fapp%2Foctofeed%2Fid574223751%3Fmt%3D8%2526uo%3D4&RD_PARM1=https%3A%2F%2Fitunes.apple.com%2Fjp%2Fapp%2Foctofeed%2Fid574223751%3Fmt%3D8%2526uo%3D4).
 
 ---
 

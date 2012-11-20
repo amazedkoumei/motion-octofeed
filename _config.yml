@@ -10,7 +10,8 @@ kramdown:
 
 project: motion-octofeed
 name: Octofeed
-description: This is ios app for reading Github Feed. 
+description: This is ios app for reading Github Feed.
+app_id: 574223751 
 
 page_list: 
 - name: Home
