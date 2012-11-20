@@ -58,6 +58,11 @@ or if you want to manage your gems per project, use command below
 $ bundle install --path bundle
 ```
 
+AppStoreでの販売 / Sale in AppStore
+----------
+
+Please Download ![here](https://itunes.apple.com/jp/app/octofeed/id574223751 "appstore")
+
 スクリーンショット / Screenshot
 ----------
 ![main_table_view_controller.png](http://amazedkoumei.github.com/motion-octofeed/screenshot/main_table_view_controller.png "main_table_view_controller.png")
