@@ -61,7 +61,7 @@ $ bundle install --path bundle
 AppStoreでの販売 / Sale in AppStore
 ----------
 
-Please Download ![here](https://itunes.apple.com/jp/app/octofeed/id574223751 "appstore")
+Please Download [here](https://itunes.apple.com/jp/app/octofeed/id574223751 "appstore")
 
 スクリーンショット / Screenshot
 ----------
