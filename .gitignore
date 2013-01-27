@@ -9,3 +9,4 @@ resources/*.momd
 resources/*.storyboardc
 .bundle/
 bundle/
+.DS_Store
