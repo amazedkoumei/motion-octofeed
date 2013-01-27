@@ -3,7 +3,7 @@ class MainTableViewController < UITableViewController
   
   def viewDidLoad()
     super
-
+    
     view.dataSource = view.delegate = self
     navigationItem.title = App.name
     navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
@@ -19,16 +19,16 @@ class MainTableViewController < UITableViewController
       self.refreshControl = r
     end
 
-    @informView = InformView.new.tap do |v|
-      v.message = "loading.."
-      navigationController.view.addSubview(v)
-    end
-
     if(!hasFeedAuthInfo?)
       showGithubFeedViewController()
     else
       fetchFeed()
     end
+  end
+
+  def viewWillAppear(animated)
+    super
+    navigationController.setToolbarHidden(true, animated:false)
   end
 
   def numberOfSectionsInTableView(tableView)
@@ -97,7 +97,8 @@ class MainTableViewController < UITableViewController
 
   def fetchFeed()
     begin
-      @informView.showWithAnimation(false)
+      #@informView.showWithAnimation(false)
+      AMP::InformView.show("loading..", target:navigationController.view, animated:true)
 
       token = App::Persistence[$USER_DEFAULTS_KEY_FEED_TOKEN] || ""
       username = App::Persistence[$USER_DEFAULTS_KEY_USERNAME] || ""
@@ -163,7 +164,8 @@ class MainTableViewController < UITableViewController
     if @refreshControl.isRefreshing == true
       @refreshControl.endRefreshing()
     end
-    @informView.hideWithAnimation(true)
+    #@informView.hideWithAnimation(true)
+    AMP::InformView.hide(true)
   end
 
   # BW::RSSParser delegate

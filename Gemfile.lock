@@ -1,12 +1,20 @@
+GIT
+  remote: https://github.com/amazedkoumei/am-motion-parts.git
+  revision: a72e383b28576d4a14bfc8a858d9f6be6ec2a904
+  submodules: true
+  specs:
+    am-motion-parts (0.0.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
-    bubble-wrap (1.1.4)
+    bubble-wrap (1.1.5)
     motion-testflight (1.4)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  am-motion-parts!
   bubble-wrap
   motion-testflight

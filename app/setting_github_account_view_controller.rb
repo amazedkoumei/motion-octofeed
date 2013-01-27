@@ -13,9 +13,6 @@ class SettingGithubAccountViewController < UITableViewController
       navigationItem.rightBarButtonItem = b
     end
 
-    @informView = InformView.new.tap do |v|
-      navigationController.view.addSubview(v)
-    end
   end
 
   def numberOfSectionsInTableView(tableView)
@@ -93,30 +90,46 @@ class SettingGithubAccountViewController < UITableViewController
       return
     end
 
-    @informView.message = "user authenticated."
-    @informView.setNeedsDisplay()
-    @informView.showWithAnimation(true)
+    AMP::InformView.show("user authenticated.", target:navigationController.view, animated:true)
 
     @saveButton.enabled = false
     navigationItem.hidesBackButton = true
 
     App::Persistence[$USER_DEFAULTS_KEY_USERNAME] = @userName
-    # base64 encoding
-    authHeader = "Basic " + [@userName + ":" + @password].pack("m").chomp
 
-    payload = BW::JSON.generate({
-      "scopes" => ["public_repo", "user"],
-      "note" => App.name
-    })
+    #@githubAPI = AMP::GithubAPI.new()
+    payload = {
+      scopes: ["public_repo", "user", "repo", "notifications"],
+      note: App.name, 
+      note_url: "http://amazedkoumei.github.com/motion-octofeed/"
+    }
 
-    BW::HTTP.post('https://api.github.com/authorizations',{headers: {Authorization: authHeader}, payload: payload}) do |response|
-      if response.ok?
-        json = BW::JSON.parse(response.body.to_str)
-        App::Persistence[$USER_DEFAULTS_KEY_API_TOKEN] = json[:token]
-        getAndSaveFeedToken()
+    # FIXME: I'd like to use tap but I can't
+    @githubAPI = AMP::GithubAPI.instance()
+    @githubAPI.createAuthorization(@userName, @password, payload) do |error|
+      if error.nil?
+        # set auth token
+        App::Persistence[AMP::GithubAPI::USER_DEFAULT_AUTHTOKEN] = @githubAPI.authToken
+        
+        AMP::InformView.hide(true)
+        AMP::InformView.show("getting feed token.", target:navigationController.view, animated:true)
+
+        @githubAPI.fetchNewsFeedToken() do
+          # set news feed token
+          App::Persistence[$USER_DEFAULTS_KEY_FEED_TOKEN] = @githubAPI.newsFeedToken
+
+          AMP::InformView.hide(true)
+
+          @alertView = UIAlertView.new.tap do |v|
+            v.initWithTitle(nil, message:"Authenticated", delegate:self, cancelButtonTitle:nil, otherButtonTitles:"OK", nil)
+            v.show()
+          end
+
+          @saveButton.enabled = true
+        end
       else
         App.alert("Auth Failed")
-        @informView.hideWithAnimation(true)
+        AMP::InformView.hide(true)
         @saveButton.enabled = true
         navigationItem.hidesBackButton = false
       end
@@ -125,31 +138,6 @@ class SettingGithubAccountViewController < UITableViewController
 
   def alertView(alertView, clickedButtonAtIndex:buttonIndex)
     navigationController.popViewControllerAnimated(true)
-  end
-
-  def getAndSaveFeedToken()
-    @informView.message = "getting feed token."
-    @informView.setNeedsDisplay()
-    @webview = UIWebView.new.tap do |v|
-      v.loadRequest(NSURLRequest.requestWithURL(NSURL.URLWithString("https://github.com/login")))
-      v.delegate = self
-    end
-  end
-
-  def webViewDidFinishLoad(webView)
-    path = webView.request.URL.path
-    if path == "/login"
-      webView.stringByEvaluatingJavaScriptFromString("$('#login_field').val('#{@userName}');$('#password').val('#{@password}');$('#login_field')[0].form.submit()")
-    elsif path == "/"
-      token = webView.stringByEvaluatingJavaScriptFromString("$('a.feed')[0].href.match(/token=(.*)/)[1]")
-      App::Persistence[$USER_DEFAULTS_KEY_FEED_TOKEN] = token
-      @informView.hideWithAnimation(true)
-      @alertView = UIAlertView.new.tap do |v|
-        v.initWithTitle(nil, message:"Authenticated", delegate:self, cancelButtonTitle:nil, otherButtonTitles:"OK", nil)
-        v.show()
-      end
-      @saveButton.enabled = true
-    end      
   end
 
 end

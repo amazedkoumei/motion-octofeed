@@ -7,14 +7,14 @@ class WebViewController < UIViewController
     super
 
     @item = item
-    @url = item[:link]
-    navigationItem.title = @url
+    @url_string = item[:link]
+    navigationItem.title = @url_string
 
-    @github = Github.new(NSURL.URLWithString(@url))
+    @manager = GithubManager.new(@url_string, self)
 
     @webview = UIWebView.new.tap do |v|
       v.frame = self.view.bounds
-      v.loadRequest(NSURLRequest.requestWithURL(NSURL.URLWithString(@url)))
+      v.loadRequest(NSURLRequest.requestWithURL(@manager.url))
       v.scalesPageToFit = true;
       v.delegate = self
       view.addSubview(v)
@@ -34,13 +34,13 @@ class WebViewController < UIViewController
       end
       @actionItem = UIBarButtonItem.new.tap do |i|
         i.initWithBarButtonSystemItem(UIBarButtonSystemItemAction, target:self, action:'actionButton')
-        if !@github.isGithubRepository?
+        if !@manager.isGithubRepository?
           i.enabled = false
         end
       end
       @readmeItem = UIBarButtonItem.new.tap do |i|
         i.initWithTitle("README", style:UIBarButtonItemStyleBordered, target:self, action:'readmeButton')
-        if !@github.isGithubRepository?
+        if !@manager.isGithubRepository?
           i.enabled = false
         end
       end
@@ -60,12 +60,16 @@ class WebViewController < UIViewController
     end
   end
   
+  def viewWillAppear(animated)
+    super
+    navigationController.setToolbarHidden(false, animated:true)
+  end
+
   def viewDidAppear(animated)
     super
-    navigationController.setToolbarHidden(false, animated:animated)
     
     if @isHaveToRefresh
-      githubStatusUpdate()
+      @manager.fetchGithubStatus()
       @isHaveToRefresh = false
     end
   end
@@ -76,49 +80,42 @@ class WebViewController < UIViewController
   end
 
   def actionButton
-    # TODO
-    shareURL = NSURL.URLWithString(@url)
-    activityItems = [shareURL, navigationController.topViewController];
+    @activityController = AMP::ActivityViewController.new.tap do |a|
 
-    includeActivities = Array.new.tap do |arr|
-      arr<<ActivityViewInSafari.new
-      if @github.isGithubRepository?
-        if @github.isStarredRepository?
-          arr<<ActivityGithubAPI_StarDelete.new
-        else
-          arr<<ActivityGithubAPI_StarPut.new
+      activityItems = [@manager.url, navigationController.topViewController];
+
+      includeActivities = Array.new.tap do |arr|
+
+        authToken = @manager.authToken
+
+        arr<<AMP::ActivityViewController.activityOpenInSafariActivity()
+
+        if @manager.isGithubRepository?
+          if @manager.isStarredRepo
+            arr<<AMP::ActivityViewController.activityGithubAPI_StarDelete(authToken, self)
+          else
+            arr<<AMP::ActivityViewController.activityGithubAPI_StarPut(authToken, self)
+          end
+
+          if @manager.isWatchingRepo
+            arr<<AMP::ActivityViewController.activityGithubAPI_WatchDelete(authToken, self)
+          else
+            arr<<AMP::ActivityViewController.activityGithubAPI_WatchPut(authToken, self)
+          end
         end
 
-        if @github.isWatchingRepository?
-          arr<<ActivityGithubAPI_WatchDelete.new
-        else
-          arr<<ActivityGithubAPI_WatchPut.new
+        if @manager.isGithubRepositoryOrUser?
+          if @manager.isFollowingUser
+            arr<<AMP::ActivityViewController.activityGithubAPI_FollowDelete(authToken, self)
+          else
+            arr<<AMP::ActivityViewController.activityGithubAPI_FollowPut(authToken, self)
+          end
         end
       end
 
-      if @github.isGithubRepositoryOrUser?
-        if @github.isFollowingUser?
-          arr<<ActivityGithubAPI_FollowDelete.new
-        else
-          arr<<ActivityGithubAPI_FollowPut.new
-        end
-      end
+      a.initWithActivityItems(activityItems, applicationActivities:includeActivities)
+      presentViewController(a, animated:true, completion:nil)
     end
-
-    excludeActivities = [
-      UIActivityTypePostToFacebook,
-      UIActivityTypePostToTwitter,
-      UIActivityTypePostToWeibo,
-      UIActivityTypeMessage,
-      UIActivityTypePrint,
-      UIActivityTypeCopyToPasteboard,
-      UIActivityTypeAssignToContact,
-      UIActivityTypeSaveToCameraRoll
-    ]
-
-    @activityController = UIActivityViewController.alloc.initWithActivityItems(activityItems, applicationActivities:includeActivities)
-    @activityController.excludedActivityTypes = excludeActivities
-    presentViewController(@activityController, animated:true, completion:nil)
   end
 
   def readmeButton()
@@ -141,18 +138,18 @@ class WebViewController < UIViewController
     @backItem.enabled = webView.canGoBack
     @forwardItem.enabled = webView.canGoForward
     
-    @url = webView.request.URL.absoluteString
-    navigationItem.title = @url
-    githubStatusUpdate()
-    if @github.isGithubRepository?
+    @url_string = webView.request.URL.absoluteString
+    @manager = GithubManager.new(@url_string, self)
+    navigationItem.title = @url_string
+    @manager.fetchGithubStatus()
+    if @manager.isGithubRepository?
       @readmeViewController = FeatureReadmeViewController.new.tap do |v|
-        v.url = "https://" + @github.host + "/" + @github.userName + "/" + @github.repositoryName
-        v.navTitle = "#{@github.userName}/#{@github.repositoryName}"
+        v.url = "https://" + @manager.url.host + "/" + @manager.owner + "/" + @manager.repo
+        v.navTitle = "#{@manager.owner}/#{@manager.repo}"
         v.parseBeforeDidLoad()
         @readmeItem.enabled = true
       end
     end
-
   end
 
   # UIWebViewDelegate
@@ -161,17 +158,41 @@ class WebViewController < UIViewController
     App.alert($BAD_INTERNET_ACCESS_MESSAGE_FOR_WEBVIEW)
   end
 
-  # ActivityTemplateGithubApi delegate
-  def completePerformActivity()
-    githubStatusUpdate()
-  end
-
-  def githubStatusUpdate()
-    @github = Github.new(NSURL.URLWithString(@url))
-    @github.fetchGithubStatus do
-      if @github.isGithubRepositoryOrUser?
-        @actionItem.enabled = true
-      end
+  # GithubManager delegate
+  def githubFetchDidFinish()
+    if @manager.isGithubRepositoryOrUser?
+      @actionItem.enabled = true
     end
   end
+
+  # GithubApiTemplateActivity delegate
+  def completePerformActivity()
+    @actionItem.enabled = true
+    @manager.fetchGithubStatus()
+
+    App.alert("Success")
+  end
+
+  # GithubApiTemplateActivity delegate
+  def completePerformActivityWithError(errorCode)
+    @actionItem.enabled = true
+    if errorCode == 401
+      subView = SettingListViewController.new
+      subView.moveTo = subView.MOVE_TO_SETTING_GITHUB_ACCOUNT
+      view = UINavigationController.alloc.initWithRootViewController(subView)
+      
+      isHaveToRefresh = true
+
+      # FIXME: get following warning and not be present....Why?
+      # Warning: Attempt to present <UINavigationController: 0x1750ae90> on <UINavigationController: 0xd0bfd70> while a presentation is in progress!
+      #presentViewController(view, animated:true, completion:nil)
+
+      # alternative to presentViewController
+      App.alert("Error")
+      
+    else
+      App.alert("Error")
+    end
+  end
+
 end

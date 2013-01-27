@@ -6,12 +6,13 @@ class DetailViewController < UITableViewController
   def viewDidLoad()
     super
 
-    @url = item[:link]
+    @url_string = item[:link]
+    navigationItem.title = @url_string
 
-    navigationItem.title = @url
 
-    @github = Github.new(NSURL.URLWithString(@url))
-    navigationItem.title = "#{@github.userName}/#{@github.repositoryName}"
+    @manager = GithubManager.new(@url_string, self)
+
+    navigationItem.title = "#{@manager.owner}/#{@manager.repo}"
 
 
     @toolbarItems = Array.new.tap do |a|
@@ -28,29 +29,28 @@ class DetailViewController < UITableViewController
     end
 
     @profileViewController = FeatureProfileViewController.new.tap do |v|
-      v.url = "https://" + @github.host + "/" + @github.userName
-      v.navTitle = "#{@github.userName}"
+      v.url = "https://" + @manager.url.host + "/" + @manager.owner
+      v.navTitle = "#{@manager.owner}"
       v.hideDoneButton = true
       v.parseBeforeDidLoad()
     end
 
     @readmeViewController = FeatureReadmeViewController.new.tap do |v|
-      v.url = "https://" + @github.host + "/" + @github.userName + "/" + @github.repositoryName
-      v.navTitle = "#{@github.userName}/#{@github.repositoryName}"
+      v.url = "https://" + @manager.url.host + "/" + @manager.owner + "/" + @manager.repo
+      v.navTitle = "#{@manager.owner}/#{@manager.repo}"
       v.hideDoneButton = true
       v.parseBeforeDidLoad()
     end
   end
 
+  def viewWillAppear(animated)
+    super
+    navigationController.setToolbarHidden(false, animated:true)
+  end
+
   def viewDidAppear(animated)
     super
-    navigationController.setToolbarHidden(false, animated:animated)
-    
-    @github.fetchGithubStatus do
-      if @github.isGithubRepositoryOrUser?
-        @actionItem.enabled = true
-      end
-    end
+    @manager.fetchGithubStatus()
   end
 
   def viewWillDisappear(animated)
@@ -93,7 +93,7 @@ class DetailViewController < UITableViewController
           l.font = UIFont.boldSystemFontOfSize(16)
           l.shadowColor = UIColor.whiteColor
           l.shadowOffset = CGSizeMake(0, 1);
-          l.text = @url
+          l.text = @url_string
           l.when_tapped do
             view = WebViewController.new.tap do |v|
               v.item = @item
@@ -132,8 +132,8 @@ class DetailViewController < UITableViewController
         case indexPath.row
           when 0
             cell.textLabel.text = "Owner"
-            if @github.isGithubRepositoryOrUser?
-              cell.detailTextLabel.text = @userName
+            if @manager.isGithubRepositoryOrUser?
+              cell.detailTextLabel.text = @manager.owner
             else
               cell.textColor = UIColor.grayColor
               cell.accessoryType = UITableViewCellAccessoryNone
@@ -141,8 +141,8 @@ class DetailViewController < UITableViewController
             end
           when 1
             cell.textLabel.text = "README"
-            if @github.isGithubRepository?
-              cell.detailTextLabel.text = @repositoryName
+            if @manager.isGithubRepository?
+              cell.detailTextLabel.text = @manager.repo
             else
               cell.textColor = UIColor.grayColor
               cell.accessoryType = UITableViewCellAccessoryNone
@@ -169,56 +169,77 @@ class DetailViewController < UITableViewController
   end
 
   def actionButton
-    activityItems = [NSURL.URLWithString(@url), navigationController.topViewController];
+    @activityController = AMP::ActivityViewController.new.tap do |a|
 
-    includeActivities = Array.new.tap do |arr|
-      if @github.isGithubRepository?
-        if @github.isStarredRepository?
-          arr<<ActivityGithubAPI_StarDelete.new
-        else
-          arr<<ActivityGithubAPI_StarPut.new
+      activityItems = [@manager.url, navigationController.topViewController];
+
+      includeActivities = Array.new.tap do |arr|
+        
+        authToken = @manager.authToken
+
+        if @manager.isGithubRepository?
+          if @manager.isStarredRepo
+            arr<<AMP::ActivityViewController.activityGithubAPI_StarDelete(authToken, self)
+          else
+            arr<<AMP::ActivityViewController.activityGithubAPI_StarPut(authToken, self)
+          end
+
+          if @manager.isWatchingRepo
+            arr<<AMP::ActivityViewController.activityGithubAPI_WatchDelete(authToken, self)
+          else
+            arr<<AMP::ActivityViewController.activityGithubAPI_WatchPut(authToken, self)
+          end
         end
 
-        if @github.isWatchingRepository?
-          arr<<ActivityGithubAPI_WatchDelete.new
-        else
-          arr<<ActivityGithubAPI_WatchPut.new
+        if @manager.isGithubRepositoryOrUser?
+          if @manager.isFollowingUser
+            arr<<AMP::ActivityViewController.activityGithubAPI_FollowDelete(authToken, self)
+          else
+            arr<<AMP::ActivityViewController.activityGithubAPI_FollowPut(authToken, self)
+          end
         end
       end
 
-      if @github.isGithubRepositoryOrUser?
-        if @github.isFollowingUser?
-          arr<<ActivityGithubAPI_FollowDelete.new
-        else
-          arr<<ActivityGithubAPI_FollowPut.new
-        end
-      end
+      a.initWithActivityItems(activityItems, applicationActivities:includeActivities)
+      presentViewController(a, animated:true, completion:nil)
     end
-
-    excludeActivities = [
-      UIActivityTypePostToFacebook,
-      UIActivityTypePostToTwitter,
-      UIActivityTypePostToWeibo,
-      UIActivityTypeMessage,
-      UIActivityTypeMail,
-      UIActivityTypePrint,
-      UIActivityTypeCopyToPasteboard,
-      UIActivityTypeAssignToContact,
-      UIActivityTypeSaveToCameraRoll
-    ]
-
-    @activityController = UIActivityViewController.alloc.initWithActivityItems(activityItems, applicationActivities:includeActivities)
-    @activityController.excludedActivityTypes = excludeActivities
-
-    presentViewController(@activityController, animated:true, completion:nil)
   end
 
+
+  # GithubManager delegate
+  def githubFetchDidFinish()
+    if @manager.isGithubRepositoryOrUser?
+      @actionItem.enabled = true
+    end
+  end
+
+  # GithubApiTemplateActivity delegate
   def completePerformActivity()
-    @actionItem.enabled = false
-    @github.fetchGithubStatus do
-      if @github.isGithubRepositoryOrUser?
-        @actionItem.enabled = true
-      end
+    @actionItem.enabled = true
+    @manager.fetchGithubStatus()
+
+    App.alert("Success")
+  end
+
+  # GithubApiTemplateActivity delegate
+  def completePerformActivityWithError(errorCode)
+    @actionItem.enabled = true
+    if errorCode == 401
+      subView = SettingListViewController.new
+      subView.moveTo = subView.MOVE_TO_SETTING_GITHUB_ACCOUNT
+      view = UINavigationController.alloc.initWithRootViewController(subView)
+      
+      isHaveToRefresh = true
+
+      # FIXME: get following warning and not be present....Why?
+      # Warning: Attempt to present <UINavigationController: 0x1750ae90> on <UINavigationController: 0xd0bfd70> while a presentation is in progress!
+      #presentViewController(view, animated:true, completion:nil)
+
+      # alternative to presentViewController
+      App.alert("Error")
+      
+    else
+      App.alert("Error")
     end
   end
 end

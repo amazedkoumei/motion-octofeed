@@ -51,6 +51,11 @@ class FeatureTemplateWebViewController < UIViewController
 
   end
   
+  def viewWillAppear(animated)
+    super
+    navigationController.setToolbarHidden(true, animated:true)
+  end
+
   # UIWebViewDelegate
   def webView(inWeb, shouldStartLoadWithRequest:inRequest, navigationType:inType)
     if inType == UIWebViewNavigationTypeLinkClicked
