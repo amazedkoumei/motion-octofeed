@@ -61,7 +61,7 @@ $ bundle install --path bundle
 AppStoreでの販売 / Sale in AppStore
 ----------
 
-Please Download from [here](https://itunes.apple.com/jp/app/octofeed/id574223751 "appstore")
+Please Download from [here](https://itunes.apple.com/app/octofeed/id574223751 "appstore")
 
 スクリーンショット / Screenshot
 ----------
@@ -72,6 +72,12 @@ Please Download from [here](https://itunes.apple.com/jp/app/octofeed/id574223751
 
 ![feature_profile_view_controller.png](http://amazedkoumei.github.com/motion-octofeed/screenshot/feature_profile_view_controller.png "feature_profile_view_controller")
 &nbsp;![feature_readme_view_controller.png](http://amazedkoumei.github.com/motion-octofeed/screenshot/feature_readme_view_controler.png "feature_readme_view_controller")
+
+使用しているライブラリ / Using Library
+----------
++ [BubbleWrap](https://github.com/rubymotion/BubbleWrap)
++ [motion-testflight](https://github.com/HipByte/motion-testflight)
++ [am-motion-parts](https://github.com/amazedkoumei/am-motion-parts)
 
 
 ライセンス / License
