@@ -171,13 +171,23 @@ class DetailViewController < UITableViewController
   def actionButton
     @activityController = AMP::ActivityViewController.new.tap do |a|
 
-      activityItems = [@manager.url, navigationController.topViewController];
+      #TODO: set html's title to text the case of gist
+      activityItems = [@manager.url, "#{@manager.path} - Github"];
 
       includeActivities = Array.new.tap do |arr|
         
         authToken = @manager.authToken
 
+        arr<<AMP::ActivityViewController.activityOpenInSafariActivity()
+        arr<<AMP::ActivityViewController.activityHatenaBookmark(@manager.url.absoluteString, {:backurl => "octofeed:/", :backtitle => "octofeed"})
+
         if @manager.isGithubRepository?
+
+          #TODO: display always after fixed that setting title to text the case of gist
+          arr<<UIActivityTypePostToFacebook
+          arr<<UIActivityTypePostToTwitter
+          arr<<UIActivityTypeMail
+
           if @manager.isStarredRepo
             arr<<AMP::ActivityViewController.activityGithubAPI_StarDelete(authToken, self)
           else
@@ -198,6 +208,7 @@ class DetailViewController < UITableViewController
             arr<<AMP::ActivityViewController.activityGithubAPI_FollowPut(authToken, self)
           end
         end
+
       end
 
       a.initWithActivityItems(activityItems, applicationActivities:includeActivities)
@@ -213,17 +224,22 @@ class DetailViewController < UITableViewController
     end
   end
 
-  # GithubApiTemplateActivity delegate
-  def completePerformActivity()
-    @actionItem.enabled = true
-    @manager.fetchGithubStatus()
-
-    App.alert("Success")
+  def prepareGithubPerformActivity(activity)
+    @actionItem.enabled = false
+    AMP::InformView.show(activity.informationMessage(), target:view, animated:true)
   end
 
   # GithubApiTemplateActivity delegate
-  def completePerformActivityWithError(errorCode)
+  def completeGithubPerformActivity()
+    AMP::InformView.hide(true)
+    @manager.fetchGithubStatus()
+    App.alert("Success")
     @actionItem.enabled = true
+  end
+
+  # GithubApiTemplateActivity delegate
+  def completeGithubPerformActivityWithError(errorCode)
+    AMP::InformView.hide(true)
     if errorCode == 401
       subView = SettingListViewController.new
       subView.moveTo = subView.MOVE_TO_SETTING_GITHUB_ACCOUNT
@@ -241,5 +257,6 @@ class DetailViewController < UITableViewController
     else
       App.alert("Error")
     end
+    @actionItem.enabled = true
   end
 end

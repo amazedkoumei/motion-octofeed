@@ -2,6 +2,7 @@ class GithubManager
 
   attr_accessor :api
   attr_accessor :url
+  attr_accessor :path
   attr_accessor :owner
   attr_accessor :repo
   attr_accessor :isStarredRepo
@@ -13,6 +14,8 @@ class GithubManager
 
     @url_string = url_string
     @url = NSURL.URLWithString(@url_string)
+    @path = @url.path.slice(1, @url.path.length - 1)
+    @path = @path + "#" + @url.fragment unless @url.fragment.nil?
     @owner, @repo = urlToOwnerAndRepo(@url)
     @api = AMP::GithubAPI.instance
   end

@@ -89,6 +89,7 @@ class WebViewController < UIViewController
         authToken = @manager.authToken
 
         arr<<AMP::ActivityViewController.activityOpenInSafariActivity()
+        arr<<AMP::ActivityViewController.activityHatenaBookmark(@manager.url.absoluteString, {:backurl => "octofeed:/", :backtitle => "octofeed"})
 
         if @manager.isGithubRepository?
           if @manager.isStarredRepo
@@ -165,17 +166,22 @@ class WebViewController < UIViewController
     end
   end
 
-  # GithubApiTemplateActivity delegate
-  def completePerformActivity()
-    @actionItem.enabled = true
-    @manager.fetchGithubStatus()
-
-    App.alert("Success")
+  def prepareGithubPerformActivity(activity)
+    @actionItem.enabled = false
+    AMP::InformView.show(activity.informationMessage(), target:view, animated:true)
   end
 
   # GithubApiTemplateActivity delegate
-  def completePerformActivityWithError(errorCode)
+  def completeGithubPerformActivity()
+    AMP::InformView.hide(true)
+    @manager.fetchGithubStatus()
+    App.alert("Success")
     @actionItem.enabled = true
+  end
+
+  # GithubApiTemplateActivity delegate
+  def completeGithubPerformActivityWithError(errorCode)
+    AMP::InformView.hide(true)
     if errorCode == 401
       subView = SettingListViewController.new
       subView.moveTo = subView.MOVE_TO_SETTING_GITHUB_ACCOUNT
@@ -193,6 +199,7 @@ class WebViewController < UIViewController
     else
       App.alert("Error")
     end
+    @actionItem.enabled = true
   end
 
 end

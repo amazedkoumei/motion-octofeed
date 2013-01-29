@@ -17,11 +17,19 @@ Motion::Project::App.setup do |app|
   app.interface_orientations = [:portrait]
   app.icons = ["iTunesArtwork.png", "Icon.png", "Icon@2x.png", "Icon-72.png", "Icon-Small.png", "Icon-Small-50.png", "Icon-Small@2x.png","Default.png"]
   app.prerendered_icon = false
-  
+
   if File.exists?('./config.yml')
     config = YAML::load_file('./config.yml')
 
     app.identifier = config['identifier']
+    # for URL scheme
+    app.info_plist['CFBundleURLTypes'] = [
+      { 
+        'CFBundleURLName' => config['identifier'],
+        'CFBundleURLSchemes' => ["octofeed"]
+      }
+    ]
+
     app.development do
       app.codesign_certificate = config['development']['certificate']
       app.provisioning_profile = config['development']['provisioning']
