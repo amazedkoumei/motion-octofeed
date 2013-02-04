@@ -97,41 +97,47 @@ class SettingGithubAccountViewController < UITableViewController
 
     App::Persistence[$USER_DEFAULTS_KEY_USERNAME] = @userName
 
-    #@githubAPI = AMP::GithubAPI.new()
-    payload = {
-      scopes: ["public_repo", "user", "repo", "notifications"],
-      note: App.name, 
-      note_url: "http://amazedkoumei.github.com/motion-octofeed/"
-    }
-
-    # FIXME: I'd like to use tap but I can't
     @githubAPI = AMP::GithubAPI.instance()
-    @githubAPI.createAuthorization(@userName, @password, payload) do |error|
-      if error.nil?
-        # set auth token
-        App::Persistence[AMP::GithubAPI::USER_DEFAULT_AUTHTOKEN] = @githubAPI.authToken
-        
-        AMP::InformView.hide(true)
-        AMP::InformView.show("getting feed token.", target:navigationController.view, animated:true)
-
-        @githubAPI.fetchNewsFeedToken(@userName, @password) do
-          # set news feed token
-          App::Persistence[$USER_DEFAULTS_KEY_FEED_TOKEN] = @githubAPI.newsFeedToken
-
-          AMP::InformView.hide(true)
-
-          @alertView = UIAlertView.new.tap do |v|
-            v.initWithTitle(nil, message:"Authenticated", delegate:self, cancelButtonTitle:nil, otherButtonTitles:"OK", nil)
-            v.show()
-          end
-
-          @saveButton.enabled = true
-        end
+    @githubAPI.hasAuthonicated(@userName, @password, "Octofeed (API)") do |ret|
+      if ret == AMP::GithubAPI::AUTH_ERROR_MESSAGE
+        authErrorAction()
+        break
+      elsif ret == false
+        method = "createAuthorization"
+        authID = nil
       else
-        App.alert("Auth Failed")
-        AMP::InformView.hide(true)
-        @saveButton.enabled = true
-        navigationItem.hidesBackButton = false
+        method = "updateAuthorization"
+        authID = ret
+      end
+      payload = {
+        scopes: ["public_repo", "user", "repo", "notifications"],
+        note: App.name, 
+        note_url: "http://amazedkoumei.github.com/motion-octofeed/"
+      }
+      @githubAPI.send(method, @userName, @password, payload, authID) do |response|
+        if response != AMP::GithubAPI::AUTH_ERROR_MESSAGE
+          # set auth token
+          #App::Persistence[AMP::GithubAPI::USER_DEFAULT_AUTHTOKEN] = @githubAPI.authToken
+          
+          AMP::InformView.hide(true)
+          AMP::InformView.show("getting feed token.", target:navigationController.view, animated:true)
+
+          @githubAPI.fetchNewsFeedToken(@userName, @password) do
+            # set news feed token
+            App::Persistence[$USER_DEFAULTS_KEY_FEED_TOKEN] = @githubAPI.newsFeedToken
+
+            AMP::InformView.hide(true)
+
+            @alertView = UIAlertView.new.tap do |v|
+              v.initWithTitle(nil, message:"Authenticated", delegate:self, cancelButtonTitle:nil, otherButtonTitles:"OK", nil)
+              v.show()
+            end
+
+            @saveButton.enabled = true
+          end
+        else
+          authErrorAction()
+        end
       end
     end
   end
@@ -140,4 +146,10 @@ class SettingGithubAccountViewController < UITableViewController
     navigationController.popViewControllerAnimated(true)
   end
 
+  def authErrorAction()
+    App.alert("Auth Failed")
+    AMP::InformView.hide(true)
+    @saveButton.enabled = true
+    navigationItem.hidesBackButton = false
+  end
 end
