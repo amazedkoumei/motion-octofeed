@@ -184,7 +184,6 @@ class DetailViewController < UITableViewController
         if @manager.isGithubRepository?
 
           #TODO: display always after fixed that setting title to text the case of gist
-          arr<<UIActivityTypePostToFacebook
           arr<<UIActivityTypePostToTwitter
           arr<<UIActivityTypeMail
 

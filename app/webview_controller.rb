@@ -92,6 +92,11 @@ class WebViewController < UIViewController
         arr<<AMP::ActivityViewController.activityHatenaBookmark(@manager.url.absoluteString, {:backurl => "octofeed:/", :backtitle => "octofeed"})
 
         if @manager.isGithubRepository?
+          
+          #TODO: display always after fixed that setting title to text the case of gist
+          arr<<UIActivityTypePostToTwitter
+          arr<<UIActivityTypeMail
+
           if @manager.isStarredRepo
             arr<<AMP::ActivityViewController.activityGithubAPI_StarDelete(authToken, self)
           else
