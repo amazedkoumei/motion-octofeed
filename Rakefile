@@ -9,9 +9,9 @@ Bundler.require
 Motion::Project::App.setup do |app|
   # Use `rake config' to see complete project settings.
   app.name = "Octofeed"
-  app.version = '1.0.0'
+  app.version = '1.0.1'
   app.frameworks += ["MessageUI"]
-  app.sdk_version = "6.0"
+  app.sdk_version = "6.1"
   app.deployment_target = "6.0"
   app.device_family = [:iphone]
   app.interface_orientations = [:portrait]

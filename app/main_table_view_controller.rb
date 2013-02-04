@@ -182,7 +182,7 @@ class MainTableViewController < UITableViewController
   end
 
   def hasFeedAuthInfo?
-    token = App::Persistence[$USER_DEFAULTS_KEY_FEED_TOKEN] || ""
+    token = App::Persistence[AMP::GithubAPI::USER_DEFAULT_AUTHTOKEN] || ""
     username = App::Persistence[$USER_DEFAULTS_KEY_USERNAME] || ""
 
     (!token.empty? && !username.empty?)

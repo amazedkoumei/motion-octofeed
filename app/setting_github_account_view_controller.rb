@@ -114,7 +114,7 @@ class SettingGithubAccountViewController < UITableViewController
         AMP::InformView.hide(true)
         AMP::InformView.show("getting feed token.", target:navigationController.view, animated:true)
 
-        @githubAPI.fetchNewsFeedToken() do
+        @githubAPI.fetchNewsFeedToken(@userName, @password) do
           # set news feed token
           App::Persistence[$USER_DEFAULTS_KEY_FEED_TOKEN] = @githubAPI.newsFeedToken
 
