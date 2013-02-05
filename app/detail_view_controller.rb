@@ -35,6 +35,10 @@ class DetailViewController < UITableViewController
       v.parseBeforeDidLoad()
     end
 
+    @issueTableViewController = IssueTableViewController.new.tap do |v|
+      v.manager = @manager
+    end
+
     @readmeViewController = FeatureReadmeViewController.new.tap do |v|
       v.url = "https://" + @manager.url.host + "/" + @manager.owner + "/" + @manager.repo
       v.navTitle = "#{@manager.owner}/#{@manager.repo}"
@@ -59,7 +63,7 @@ class DetailViewController < UITableViewController
   end
 
   def numberOfSectionsInTableView(tableView)
-    2
+    3
   end
 
   def tableView(tableView, numberOfRowsInSection:section)
@@ -68,6 +72,8 @@ class DetailViewController < UITableViewController
         0
       when 1
         2
+      when 2
+        1
     end
   end
 
@@ -76,7 +82,9 @@ class DetailViewController < UITableViewController
       when 0
         "URL"
       when 1
-        "info"
+        "Repository: #{@manager.repo}"
+      when 2
+        "Owner: #{@manager.owner}"
     end
   end
 
@@ -128,27 +136,44 @@ class DetailViewController < UITableViewController
 
     case indexPath.section
       when 1
-        # info section
-        case indexPath.row
-          when 0
-            cell.textLabel.text = "Owner"
-            if @manager.isGithubRepositoryOrUser?
-              cell.detailTextLabel.text = @manager.owner
-            else
-              cell.textColor = UIColor.grayColor
-              cell.accessoryType = UITableViewCellAccessoryNone
-              cell.userInteractionEnabled = false
-            end
-          when 1
-            cell.textLabel.text = "README"
-            if @manager.isGithubRepository?
-              cell.detailTextLabel.text = @manager.repo
-            else
-              cell.textColor = UIColor.grayColor
-              cell.accessoryType = UITableViewCellAccessoryNone
-              cell.userInteractionEnabled = false
-            end
+      # Repository section
+      case indexPath.row
+      when 0
+        cell.textLabel.text = "README"
+        if @manager.isGithubRepository?
+          cell.detailTextLabel.text = @manager.repo
+        else
+          cell.textColor = UIColor.grayColor
+          cell.accessoryType = UITableViewCellAccessoryNone
+          cell.userInteractionEnabled = false
         end
+      when 1
+        @issuesCell = cell
+        cell.textLabel.text = "Issues"
+        if @manager.isGithubRepository?
+          @manager.api.repositoryIssueCount(@manager.owner, @manager.repo) do |count|
+            @issuesCell.detailTextLabel.text = count.to_s
+          end
+        else
+          cell.textColor = UIColor.grayColor
+          cell.accessoryType = UITableViewCellAccessoryNone
+          cell.userInteractionEnabled = false
+        end
+      end
+
+      when 2
+      # info section
+      case indexPath.row
+      when 0
+        cell.textLabel.text = "Owner"
+        if @manager.isGithubRepositoryOrUser?
+          cell.detailTextLabel.text = @manager.owner
+        else
+          cell.textColor = UIColor.grayColor
+          cell.accessoryType = UITableViewCellAccessoryNone
+          cell.userInteractionEnabled = false
+        end
+      end
     end
     cell
   end
@@ -156,16 +181,24 @@ class DetailViewController < UITableViewController
   def tableView(tableView, didSelectRowAtIndexPath:indexPath)
     case indexPath.section
       when 1
-        # info section
-        case indexPath.row
-          when 0
-            view = @profileViewController
-          when 1
-            view = @readmeViewController
-        end
-        navigationController.pushViewController(view, animated:true)
-        tableView.deselectRowAtIndexPath(indexPath, animated:false)
+      # repositry section
+      case indexPath.row
+      when 0
+        view = @readmeViewController
+      when 1
+        view = @issueTableViewController
+      end
+
+      when 1
+      # info section
+      case indexPath.row
+      when 0
+        view = @profileViewController
+      end
     end
+
+    navigationController.pushViewController(view, animated:true)
+    tableView.deselectRowAtIndexPath(indexPath, animated:false)
   end
 
   def actionButton
