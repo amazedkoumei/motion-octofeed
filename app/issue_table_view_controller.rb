@@ -33,6 +33,10 @@ class IssueTableViewController < UITableViewController
     navigationController.setToolbarHidden(true, animated:false)
   end
 
+  def viewDidDisappear(animated)
+    AMP::InformView.hide(false)
+  end
+
   def numberOfSectionsInTableView(tableView)
     if(!@json.nil?)
       #@json.size
@@ -81,14 +85,6 @@ class IssueTableViewController < UITableViewController
   def tableView(tableView, heightForRowAtIndexPath:indexPath)
     80
   end
-
-=begin
-  def tableView(tableView, titleForHeaderInSection:section)
-    if(!@json.nil?)
-      @json.keys[section]
-    end
-  end
-=end
 
   def fetchFeed()
     begin

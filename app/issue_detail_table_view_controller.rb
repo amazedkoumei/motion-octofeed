@@ -33,6 +33,10 @@ class IssueDetailTableViewController < UITableViewController
     navigationController.setToolbarHidden(true, animated:false)
   end
 
+  def viewDidDisappear(animated)
+    AMP::InformView.hide(false)
+  end
+
   def numberOfSectionsInTableView(tableView)
     2
   end
