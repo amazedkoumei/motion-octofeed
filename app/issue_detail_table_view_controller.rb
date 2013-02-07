@@ -9,12 +9,6 @@ class IssueDetailTableViewController < UITableViewController
     view.dataSource = view.delegate = self
     navigationItem.title = "#{@manager.repo}/issues"
 
-=begin
-    @settingButton = UIBarButtonItem.new.tap do |b|
-      b.initWithTitle("setting", style:UIBarButtonItemStylePlain, target:self, action:"settingButton")
-      navigationItem.rightBarButtonItem = b
-    end
-=end
     @refreshControl = UIRefreshControl.new.tap do |r|
       r.attributedTitle = NSAttributedString.alloc.initWithString("now refreshing...")
       r.addTarget(self, action:"fetchFeed", forControlEvents:UIControlEventValueChanged)
@@ -72,6 +66,7 @@ class IssueDetailTableViewController < UITableViewController
         cell = IssueDetailTableViewCell.new.tap do |c|
           c.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:cellId)
           c.selectionStyle = UITableViewCellSelectionStyleBlue
+          c.userInteractionEnabled = false
           c.issue = @issue
         end
         cell
@@ -82,6 +77,7 @@ class IssueDetailTableViewController < UITableViewController
         cell = IssueDetailCommentTableViewCell.new.tap do |c|
           c.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:cellId)
           c.selectionStyle = UITableViewCellSelectionStyleBlue
+          c.userInteractionEnabled = false
           c.comment = @json[indexPath.row]
         end
         cell
@@ -90,22 +86,7 @@ class IssueDetailTableViewController < UITableViewController
   end
 
   def tableView(tableView, didSelectRowAtIndexPath:indexPath)
-    # App will crash if @detailView release before "@github.fetchGithubStatus" callend in DetailViewController have not finished
-    @detailViewStack ||= []
-    if @detailViewStack.size < 5
-      @detailViewStack << @detailView
-    else
-      @detailViewStack = []
-      @detailViewStack << @detailView
-    end
-
-    @detailView = DetailViewController.new.tap do |v|
-      v.initWithStyle(UITableViewStyleGrouped)
-      key = @json.keys[indexPath.section]
-      v.item = @json[key][indexPath.row]
-    end
-    navigationController.pushViewController(@detailView, animated:true)
-    tableView.deselectRowAtIndexPath(indexPath, animated:false)
+    # do nothing
   end
 
   def tableView(tableView, heightForRowAtIndexPath:indexPath)
@@ -129,14 +110,6 @@ class IssueDetailTableViewController < UITableViewController
     end
   end
 
-=begin
-  def tableView(tableView, titleForHeaderInSection:section)
-    if(!@json.nil?)
-      @json.keys[section]
-    end
-  end
-=end
-
   def fetchFeed()
     begin
       AMP::InformView.show("loading..", target:navigationController.view, animated:true)
@@ -158,7 +131,6 @@ class IssueDetailTableViewController < UITableViewController
     if @refreshControl.isRefreshing == true
       @refreshControl.endRefreshing()
     end
-    #@informView.hideWithAnimation(true)
     AMP::InformView.hide(true)
   end
 
@@ -172,14 +144,6 @@ class IssueDetailTableViewController < UITableViewController
   def showGithubFeedViewController()
     subView = SettingListViewController.new.tap do |v|
       v.moveTo = v.MOVE_TO_SETTING_GITHUB_FEED
-      v.mainTableViewContoroller = self
-    end
-    view = UINavigationController.alloc.initWithRootViewController(subView)
-    presentViewController(view, animated:true, completion:nil)
-  end
-
-  def settingButton
-    subView = SettingListViewController.new.tap do |v|
       v.mainTableViewContoroller = self
     end
     view = UINavigationController.alloc.initWithRootViewController(subView)
