@@ -60,8 +60,7 @@ class IssueTableViewController < UITableViewController
     
     issue = @json[indexPath.row]
 
-    #cellId = feed[:title] + feed[:updated]
-    cellId = "hoge"
+    cellId = issue[:id].to_s
     cell = tableView.dequeueReusableCellWithIdentifier(cellId) || begin
       cell = IssueTableViewCell.new.tap do |c|
         c.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:cellId)
