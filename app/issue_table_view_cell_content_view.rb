@@ -26,20 +26,14 @@ class IssueTableViewCellContentView < UIView
 
     UIColor.grayColor.setFill()
     commentsRect = rect;
-    commentsRect.origin.x = 250
-    commentsRect.origin.y = 10
-    commentsRect.size.height = 10
-    commentsRect.size.width = rect.size.width - 20;
+    commentsRect = [[230, 10], [rect.size.width, 10]]
     @commentsFont ||= begin
       UIFont.fontWithName("Helvetica", size:12)
     end
     "#{@cell.issue[:comments]} comments".drawInRect(commentsRect, withFont:@commentsFont, lineBreakMode:NSLineBreakByWordWrapping)
 
     timeRect = rect;
-    timeRect.origin.x = 10
-    timeRect.origin.y = 10
-    timeRect.size.height = 10
-    timeRect.size.width = rect.size.width - 20;
+    timeRect = [[10, 10], [rect.size.width, 10]]
     @timeFont ||= begin
       UIFont.fontWithName("Helvetica", size:12)
     end
@@ -63,15 +57,11 @@ class IssueTableViewCellContentView < UIView
     nsDate = inputFormatter.dateFromString(@cell.issue[:updated_at])
     date = outputDateFormatter.stringFromDate(nsDate)
     time = outputTimeFormatter.stringFromDate(nsDate)    
-
     "##{@cell.issue[:number]} - #{date} #{time}".drawInRect(timeRect, withFont:@timeFont, lineBreakMode:NSLineBreakByWordWrapping)
 
     UIColor.blackColor.setFill()      
     titleRect = rect
-    titleRect.origin.x = 50
-    titleRect.origin.y = 30
-    titleRect.size.height = 80
-    titleRect.size.width = 250;
+    titleRect = [[50, 30], [250, 80]]
     @titleFont ||= begin
       UIFont.fontWithName("Helvetica", size:14)
     end
@@ -89,9 +79,14 @@ class IssueTableViewCellContentView < UIView
         @cell.issue[:user][:avatar_image] = UIImage.imageWithContentsOfFile(filePath)
       end
 
-      @img_rect = rect;
-      @img_rect.origin.x = 0;
-      @img_rect.origin.y = 0;
+      @img_rect = rect
+      
+      # FIXME: error: reason is @img_rect.size->2 why??
+      #@img_rect = [[0, 0], [30, 30]]
+      
+      # x, y set at drawAtPoint
+      @img_rect.origin.x = 0
+      @img_rect.origin.y = 0
       @img_rect.size.height = 30
       @img_rect.size.width = 30
 

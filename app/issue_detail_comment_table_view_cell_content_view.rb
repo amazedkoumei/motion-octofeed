@@ -25,20 +25,14 @@ class IssueDetailCommentTableViewCellContentView < UIView
   def drawRect(rect)
     UIColor.grayColor.setFill()
     commentsRect = rect;
-    commentsRect.origin.x = 10
-    commentsRect.origin.y = 10
-    commentsRect.size.height = 10
-    commentsRect.size.width = rect.size.width - 20;
+    commentsRect = [[10, 10], [rect.size.width, 10]]
     @commentsFont ||= begin
       UIFont.fontWithName("Helvetica", size:12)
     end
     "#{@cell.comment[:user][:login]}".drawInRect(commentsRect, withFont:@commentsFont, lineBreakMode:NSLineBreakByWordWrapping)
 
     timeRect = rect;
-    timeRect.origin.x = 190
-    timeRect.origin.y = 10
-    timeRect.size.height = 10
-    timeRect.size.width = rect.size.width - 20;
+    timeRect = [[190, 10], [rect.size.width, 10]]
     @timeFont ||= begin
       UIFont.fontWithName("Helvetica", size:12)
     end
@@ -62,11 +56,13 @@ class IssueDetailCommentTableViewCellContentView < UIView
     nsDate = inputFormatter.dateFromString(@cell.comment[:updated_at])
     date = outputDateFormatter.stringFromDate(nsDate)
     time = outputTimeFormatter.stringFromDate(nsDate)    
-
     "#{date} #{time}".drawInRect(timeRect, withFont:@timeFont, lineBreakMode:NSLineBreakByWordWrapping)
 
     UIColor.blackColor.setFill()      
     titleRect = rect
+    # FIXME: error: reason is @img_rect.size->2 why??
+    #titleRect = [[50, 30], 250, 80]
+
     titleRect.origin.x = 50
     titleRect.origin.y = 30
     titleRect.size.height = 80
@@ -75,6 +71,7 @@ class IssueDetailCommentTableViewCellContentView < UIView
       UIFont.fontWithName("Helvetica", size:14)
     end
 
+    # adjust cell height
     cell_content_width = 250
     cell_content_margin = 0
     text = @cell.comment[:body]

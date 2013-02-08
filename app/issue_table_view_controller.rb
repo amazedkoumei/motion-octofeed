@@ -86,7 +86,7 @@ class IssueTableViewController < UITableViewController
       #@informView.showWithAnimation(false)
       AMP::InformView.show("loading..", target:navigationController.view, animated:true)
 
-      @manager.api.getRepositoryIssueList(@manager.owner, @manager.repo) do |response|
+      @manager.api.getRepositoryIssueList(@manager.owner, @manager.repo, {per_page: 100}) do |response|
         if response.ok?
           @json = BW::JSON.parse(response.body)
 

@@ -154,14 +154,19 @@ class DetailViewController < UITableViewController
       when 1
         @issuesCell = cell
         cell.textLabel.text = "Issues"
+        cell.userInteractionEnabled = false
         if @manager.isGithubRepository?
-          @manager.api.repositoryIssueCount(@manager.owner, @manager.repo) do |count|
-            @issuesCell.detailTextLabel.text = count.to_s
+          @manager.api.repositoryIssueCount(@manager.owner, @manager.repo, {per_page: 100}) do |count|
+            if count.is_a?(Numeric)
+              cell.userInteractionEnabled = true
+              @issuesCell.detailTextLabel.text = count.to_s
+            else
+              @issuesCell.detailTextLabel.text = "disable"
+            end
           end
         else
           cell.textColor = UIColor.grayColor
           cell.accessoryType = UITableViewCellAccessoryNone
-          cell.userInteractionEnabled = false
         end
       end
 
