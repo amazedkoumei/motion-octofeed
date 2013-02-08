@@ -9,28 +9,26 @@ class IssueTableViewController < UITableViewController
     view.dataSource = view.delegate = self
     navigationItem.title = "#{@manager.repo}/issues"
 
-=begin
-    @settingButton = UIBarButtonItem.new.tap do |b|
-      b.initWithTitle("setting", style:UIBarButtonItemStylePlain, target:self, action:"settingButton")
-      navigationItem.rightBarButtonItem = b
-    end
-=end
     @refreshControl = UIRefreshControl.new.tap do |r|
       r.attributedTitle = NSAttributedString.alloc.initWithString("now refreshing...")
-      r.addTarget(self, action:"fetchFeed", forControlEvents:UIControlEventValueChanged)
+      r.addTarget(self, action:"refresh", forControlEvents:UIControlEventValueChanged)
       self.refreshControl = r
-    end
-
-    if(!hasFeedAuthInfo?)
-      showGithubFeedViewController()
-    else
-      fetchFeed()
     end
   end
 
   def viewWillAppear(animated)
     super
     navigationController.setToolbarHidden(true, animated:false)
+    App.notification_center.unobserve @managerErrorObserver
+    @managerErrorObserver = App.notification_center.observe GithubManager::ERROR_NOTIFICATION do |notification|
+      GithubManager.showAccountSettingViewController(self)
+    end
+    refresh() if @json.nil?
+  end
+
+  def viewWillDisappear(animated)
+    super
+    App.notification_center.unobserve @managerErrorObserver
   end
 
   def viewDidDisappear(animated)
@@ -39,8 +37,6 @@ class IssueTableViewController < UITableViewController
 
   def numberOfSectionsInTableView(tableView)
     if(!@json.nil?)
-      #@json.size
-      #p @json.size
       1
     else
       0
@@ -85,7 +81,7 @@ class IssueTableViewController < UITableViewController
     80
   end
 
-  def fetchFeed()
+  def refresh()
     begin
       #@informView.showWithAnimation(false)
       AMP::InformView.show("loading..", target:navigationController.view, animated:true)
@@ -94,16 +90,16 @@ class IssueTableViewController < UITableViewController
         if response.ok?
           @json = BW::JSON.parse(response.body)
 
-          finishFetch()
+          finishRefresh()
         end
       end
     rescue => e
-      finishFetch()
+      finishRefresh()
       App.alert(e)
     end
   end
 
-  def finishFetch()
+  def finishRefresh()
     view.reloadData
     if @refreshControl.isRefreshing == true
       @refreshControl.endRefreshing()
@@ -112,27 +108,4 @@ class IssueTableViewController < UITableViewController
     AMP::InformView.hide(true)
   end
 
-  def hasFeedAuthInfo?
-    token = App::Persistence[AMP::GithubAPI::USER_DEFAULT_AUTHTOKEN] || ""
-    username = App::Persistence[$USER_DEFAULTS_KEY_USERNAME] || ""
-
-    (!token.empty? && !username.empty?)
-  end
-
-  def showGithubFeedViewController()
-    subView = SettingListViewController.new.tap do |v|
-      v.moveTo = v.MOVE_TO_SETTING_GITHUB_FEED
-      v.mainTableViewContoroller = self
-    end
-    view = UINavigationController.alloc.initWithRootViewController(subView)
-    presentViewController(view, animated:true, completion:nil)
-  end
-
-  def settingButton
-    subView = SettingListViewController.new.tap do |v|
-      v.mainTableViewContoroller = self
-    end
-    view = UINavigationController.alloc.initWithRootViewController(subView)
-    presentViewController(view, animated:true, completion:nil)
-  end
 end

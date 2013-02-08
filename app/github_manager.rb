@@ -9,6 +9,8 @@ class GithubManager
   attr_accessor :isWatchingRepo
   attr_accessor :isFollowingUser
 
+  ERROR_NOTIFICATION = "github_manager_error_notification"
+
   def initialize(url_string, delegate)
     @delegate = delegate
 
@@ -18,6 +20,18 @@ class GithubManager
     @path = @path + "#" + @url.fragment unless @url.fragment.nil?
     @owner, @repo = urlToOwnerAndRepo(@url)
     @api = AMP::GithubAPI.instance
+    def @api.errorAction(response, query)
+      p "method name: #{__method__}"
+      App.notification_center.post ERROR_NOTIFICATION
+    end
+  end
+
+  def self.showAccountSettingViewController(viewController)
+    subView = SettingListViewController.new.tap do |v|
+      v.moveTo = v.MOVE_TO_SETTING_GITHUB_FEED
+    end
+    view = UINavigationController.alloc.initWithRootViewController(subView)
+    viewController.presentViewController(view, animated:true, completion:nil)
   end
 
   def authToken

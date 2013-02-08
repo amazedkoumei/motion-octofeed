@@ -50,6 +50,9 @@ class DetailViewController < UITableViewController
   def viewWillAppear(animated)
     super
     navigationController.setToolbarHidden(false, animated:true)
+    @managerErrorObserver = App.notification_center.observe GithubManager::ERROR_NOTIFICATION do |notification|
+      GithubManager.showAccountSettingViewController(self)
+    end
   end
 
   def viewDidAppear(animated)
@@ -60,6 +63,7 @@ class DetailViewController < UITableViewController
   def viewWillDisappear(animated)
     super
     navigationController.setToolbarHidden(true, animated:animated)
+    App.notification_center.unobserve @managerErrorObserver
   end
 
   def numberOfSectionsInTableView(tableView)
