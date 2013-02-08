@@ -21,7 +21,6 @@ class GithubManager
     @owner, @repo = urlToOwnerAndRepo(@url)
     @api = AMP::GithubAPI.instance
     def @api.errorAction(response, query)
-      p "method name: #{__method__}"
       App.notification_center.post ERROR_NOTIFICATION
     end
   end
