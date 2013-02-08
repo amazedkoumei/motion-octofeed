@@ -9,7 +9,6 @@ class DetailViewController < UITableViewController
     @url_string = item[:link]
     navigationItem.title = @url_string
 
-
     @manager = GithubManager.new(@url_string, self)
 
     navigationItem.title = "#{@manager.owner}/#{@manager.repo}"
@@ -35,8 +34,20 @@ class DetailViewController < UITableViewController
       v.parseBeforeDidLoad()
     end
 
-    @issueTableViewController = IssueTableViewController.new.tap do |v|
-      v.manager = @manager
+    @issueTableViewController = UITabBarController.new.tap do |v|
+      v.viewControllers = [
+        IssueTableViewController.new.tap do |sv|
+          # display open issue
+          sv.manager = @manager
+          sv.tabBarItem = UITabBarItem.new.initWithTitle("Open", image:nil, tag:0)
+        end,
+        IssueTableViewController.new.tap do |sv|
+          # display closed issue
+          sv.manager = @manager
+          sv.state = "closed"
+          sv.tabBarItem = UITabBarItem.new.initWithTitle("Closed", image:nil, tag:1)
+        end
+      ]
     end
 
     @readmeViewController = FeatureReadmeViewController.new.tap do |v|
@@ -160,8 +171,14 @@ class DetailViewController < UITableViewController
             if count.is_a?(Numeric)
               cell.userInteractionEnabled = true
               @issuesCell.detailTextLabel.text = count.to_s
+              @issueTableViewController.viewControllers[0].tabBarItem.badgeValue = count.to_s
             else
               @issuesCell.detailTextLabel.text = "disable"
+            end
+          end
+          @manager.api.repositoryIssueCount(@manager.owner, @manager.repo, {per_page: 100, state: "closed"}) do |count|
+            if count.is_a?(Numeric)
+              @issueTableViewController.viewControllers[1].tabBarItem.badgeValue = count.to_s
             end
           end
         else

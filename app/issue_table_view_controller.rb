@@ -2,12 +2,14 @@
 class IssueTableViewController < UITableViewController
   
   attr_accessor :manager
+  attr_accessor :state  # "open" or "closed". if nil, "open"
 
   def viewDidLoad()
     super
     
     view.dataSource = view.delegate = self
-    navigationItem.title = "#{@manager.repo}/issues"
+    navigationItem.title = "#{@manager.repo}/issues" unless navigationItem.nil?
+    tabBarController.title = "#{@manager.repo}/issues" unless tabBarController.nil?
 
     @refreshControl = UIRefreshControl.new.tap do |r|
       r.attributedTitle = NSAttributedString.alloc.initWithString("now refreshing...")
@@ -85,11 +87,14 @@ class IssueTableViewController < UITableViewController
     begin
       #@informView.showWithAnimation(false)
       AMP::InformView.show("loading..", target:navigationController.view, animated:true)
-
-      @manager.api.getRepositoryIssueList(@manager.owner, @manager.repo, {per_page: 100}) do |response|
+      payload = {
+        per_page: 100
+      }
+      payload[:state] = @state unless state.nil?
+      @manager.api.getRepositoryIssueList(@manager.owner, @manager.repo, payload) do |response|
         if response.ok?
           @json = BW::JSON.parse(response.body)
-
+          tabBarItem.badgeValue = @json.length.to_s
           finishRefresh()
         end
       end
