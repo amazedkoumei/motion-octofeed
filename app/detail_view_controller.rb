@@ -193,7 +193,7 @@ class DetailViewController < UITableViewController
         view = @issueTableViewController
       end
 
-      when 1
+      when 2
       # info section
       case indexPath.row
       when 0
