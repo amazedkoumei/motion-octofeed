@@ -110,7 +110,8 @@ class SettingGithubAccountViewController < UITableViewController
         authID = ret
       end
       payload = {
-        scopes: ["public_repo", "user", "repo", "notifications"],
+        #scopes: ["public_repo", "user", "repo", "notifications"],
+        scopes: ["public_repo", "user", "notifications"],
         note: App.name, 
         note_url: "http://amazedkoumei.github.com/motion-octofeed/"
       }
