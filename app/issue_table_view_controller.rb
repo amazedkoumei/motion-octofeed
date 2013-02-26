@@ -64,7 +64,7 @@ class IssueTableViewController < UITableViewController
         c.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:cellId)
         c.selectionStyle = UITableViewCellSelectionStyleBlue
         c.accessoryType = UITableViewCellAccessoryDisclosureIndicator
-        c.issue = issue
+        c.dataSource = issue
       end
       cell
     end

@@ -9,7 +9,7 @@ Bundler.require
 Motion::Project::App.setup do |app|
   # Use `rake config' to see complete project settings.
   app.name = "Octofeed"
-  app.version = '1.0.1'
+  app.version = '1.0.2'
   app.info_plist['CFBundleShortVersionString'] = '1.0.1'
   app.frameworks += ["MessageUI"]
   app.sdk_version = "6.1"

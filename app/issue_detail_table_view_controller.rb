@@ -70,7 +70,7 @@ class IssueDetailTableViewController < UITableViewController
           c.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:cellId)
           c.selectionStyle = UITableViewCellSelectionStyleBlue
           c.userInteractionEnabled = false
-          c.issue = @issue
+          c.dataSource = @issue
         end
         cell
       end
@@ -81,7 +81,7 @@ class IssueDetailTableViewController < UITableViewController
           c.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:cellId)
           c.selectionStyle = UITableViewCellSelectionStyleBlue
           c.userInteractionEnabled = false
-          c.comment = @json[indexPath.row]
+          c.dataSource = @json[indexPath.row]
         end
         cell
       end

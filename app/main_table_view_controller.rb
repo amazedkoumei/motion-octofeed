@@ -61,7 +61,7 @@ class MainTableViewController < UITableViewController
         c.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:cellId)
         c.selectionStyle = UITableViewCellSelectionStyleBlue
         c.accessoryType = UITableViewCellAccessoryDisclosureIndicator
-        c.feed = feed
+        c.dataSource = feed
       end
       cell
     end
