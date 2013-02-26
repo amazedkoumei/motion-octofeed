@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 class SettingListViewController < UITableViewController
 
-  attr_accessor :moveTo, :mainTableViewContoroller
+  attr_accessor :moveTo
 
   # FIXME: How to write Ruby's Constant
   def MOVE_TO_SETTING_GITHUB_FEED
@@ -78,7 +78,6 @@ class SettingListViewController < UITableViewController
   end
 
   def doneButton
-    mainTableViewContoroller.fetchFeed()
     dismissViewControllerAnimated(true, completion:nil)
   end
 end

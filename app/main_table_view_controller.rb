@@ -15,20 +15,21 @@ class MainTableViewController < UITableViewController
 
     @refreshControl = UIRefreshControl.new.tap do |r|
       r.attributedTitle = NSAttributedString.alloc.initWithString("now refreshing...")
-      r.addTarget(self, action:"fetchFeed", forControlEvents:UIControlEventValueChanged)
+      r.addTarget(self, action:"refresh", forControlEvents:UIControlEventValueChanged)
       self.refreshControl = r
     end
 
     if(!hasFeedAuthInfo?)
-      showGithubFeedViewController()
-    else
-      fetchFeed()
+      GithubManager.showAccountSettingViewController(self)
     end
   end
 
   def viewWillAppear(animated)
     super
     navigationController.setToolbarHidden(true, animated:false)
+    if(@parsedHash.nil?)
+      refresh()
+    end
   end
 
   def numberOfSectionsInTableView(tableView)
@@ -95,7 +96,7 @@ class MainTableViewController < UITableViewController
     end
   end
 
-  def fetchFeed()
+  def refresh()
     begin
       #@informView.showWithAnimation(false)
       AMP::InformView.show("loading..", target:navigationController.view, animated:true)
@@ -155,12 +156,12 @@ class MainTableViewController < UITableViewController
         end
       end
     rescue => e
-      finishFetch()
+      finishRefresh()
       App.alert(e)
     end
   end
 
-  def finishFetch()
+  def finishRefresh()
     if @refreshControl.isRefreshing == true
       @refreshControl.endRefreshing()
     end
@@ -170,14 +171,14 @@ class MainTableViewController < UITableViewController
 
   # BW::RSSParser delegate
   def when_parser_is_done
-    finishFetch()
+    finishRefresh()
     @parsedHash = @parsingHash.clone
     view.reloadData
   end
 
   # BW::RSSParser delegate
   def when_parser_errors
-    finishFetch()
+    finishRefresh()
     App.alert($BAD_INTERNET_ACCESS_MESSAGE)
   end
 
@@ -188,19 +189,8 @@ class MainTableViewController < UITableViewController
     (!token.empty? && !username.empty?)
   end
 
-  def showGithubFeedViewController()
-    subView = SettingListViewController.new.tap do |v|
-      v.moveTo = v.MOVE_TO_SETTING_GITHUB_FEED
-      v.mainTableViewContoroller = self
-    end
-    view = UINavigationController.alloc.initWithRootViewController(subView)
-    presentViewController(view, animated:true, completion:nil)
-  end
-
   def settingButton
-    subView = SettingListViewController.new.tap do |v|
-      v.mainTableViewContoroller = self
-    end
+    subView = SettingListViewController.new()
     view = UINavigationController.alloc.initWithRootViewController(subView)
     presentViewController(view, animated:true, completion:nil)
   end

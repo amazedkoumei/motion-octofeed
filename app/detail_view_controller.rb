@@ -9,7 +9,6 @@ class DetailViewController < UITableViewController
     @url_string = item[:link]
     navigationItem.title = @url_string
 
-
     @manager = GithubManager.new(@url_string, self)
 
     navigationItem.title = "#{@manager.owner}/#{@manager.repo}"
@@ -35,6 +34,22 @@ class DetailViewController < UITableViewController
       v.parseBeforeDidLoad()
     end
 
+    @issueTableViewController = UITabBarController.new.tap do |v|
+      v.viewControllers = [
+        IssueTableViewController.new.tap do |sv|
+          # display open issue
+          sv.manager = @manager
+          sv.tabBarItem = UITabBarItem.new.initWithTitle("Open", image:nil, tag:0)
+        end,
+        IssueTableViewController.new.tap do |sv|
+          # display closed issue
+          sv.manager = @manager
+          sv.state = "closed"
+          sv.tabBarItem = UITabBarItem.new.initWithTitle("Closed", image:nil, tag:1)
+        end
+      ]
+    end
+
     @readmeViewController = FeatureReadmeViewController.new.tap do |v|
       v.url = "https://" + @manager.url.host + "/" + @manager.owner + "/" + @manager.repo
       v.navTitle = "#{@manager.owner}/#{@manager.repo}"
@@ -46,6 +61,9 @@ class DetailViewController < UITableViewController
   def viewWillAppear(animated)
     super
     navigationController.setToolbarHidden(false, animated:true)
+    @managerErrorObserver = App.notification_center.observe GithubManager::ERROR_NOTIFICATION do |notification|
+      GithubManager.showAccountSettingViewController(self)
+    end
   end
 
   def viewDidAppear(animated)
@@ -56,10 +74,11 @@ class DetailViewController < UITableViewController
   def viewWillDisappear(animated)
     super
     navigationController.setToolbarHidden(true, animated:animated)
+    App.notification_center.unobserve @managerErrorObserver
   end
 
   def numberOfSectionsInTableView(tableView)
-    2
+    3
   end
 
   def tableView(tableView, numberOfRowsInSection:section)
@@ -68,6 +87,8 @@ class DetailViewController < UITableViewController
         0
       when 1
         2
+      when 2
+        1
     end
   end
 
@@ -76,7 +97,9 @@ class DetailViewController < UITableViewController
       when 0
         "URL"
       when 1
-        "info"
+        "Repository: #{@manager.repo}"
+      when 2
+        "Owner: #{@manager.owner}"
     end
   end
 
@@ -128,27 +151,55 @@ class DetailViewController < UITableViewController
 
     case indexPath.section
       when 1
-        # info section
-        case indexPath.row
-          when 0
-            cell.textLabel.text = "Owner"
-            if @manager.isGithubRepositoryOrUser?
-              cell.detailTextLabel.text = @manager.owner
-            else
-              cell.textColor = UIColor.grayColor
-              cell.accessoryType = UITableViewCellAccessoryNone
-              cell.userInteractionEnabled = false
-            end
-          when 1
-            cell.textLabel.text = "README"
-            if @manager.isGithubRepository?
-              cell.detailTextLabel.text = @manager.repo
-            else
-              cell.textColor = UIColor.grayColor
-              cell.accessoryType = UITableViewCellAccessoryNone
-              cell.userInteractionEnabled = false
-            end
+      # Repository section
+      case indexPath.row
+      when 0
+        cell.textLabel.text = "README"
+        if @manager.isGithubRepository?
+          cell.detailTextLabel.text = @manager.repo
+        else
+          cell.textColor = UIColor.grayColor
+          cell.accessoryType = UITableViewCellAccessoryNone
+          cell.userInteractionEnabled = false
         end
+      when 1
+        @issuesCell = cell
+        cell.textLabel.text = "Issues"
+        cell.userInteractionEnabled = false
+        if @manager.isGithubRepository?
+          @manager.api.repositoryIssueCount(@manager.owner, @manager.repo, {per_page: 100}) do |count|
+            if count.is_a?(Numeric)
+              cell.userInteractionEnabled = true
+              @issuesCell.detailTextLabel.text = count.to_s
+              @issueTableViewController.viewControllers[0].tabBarItem.badgeValue = count.to_s
+            else
+              @issuesCell.detailTextLabel.text = "disable"
+            end
+          end
+          @manager.api.repositoryIssueCount(@manager.owner, @manager.repo, {per_page: 100, state: "closed"}) do |count|
+            if count.is_a?(Numeric)
+              @issueTableViewController.viewControllers[1].tabBarItem.badgeValue = count.to_s
+            end
+          end
+        else
+          cell.textColor = UIColor.grayColor
+          cell.accessoryType = UITableViewCellAccessoryNone
+        end
+      end
+
+      when 2
+      # info section
+      case indexPath.row
+      when 0
+        cell.textLabel.text = "Owner"
+        if @manager.isGithubRepositoryOrUser?
+          cell.detailTextLabel.text = @manager.owner
+        else
+          cell.textColor = UIColor.grayColor
+          cell.accessoryType = UITableViewCellAccessoryNone
+          cell.userInteractionEnabled = false
+        end
+      end
     end
     cell
   end
@@ -156,16 +207,24 @@ class DetailViewController < UITableViewController
   def tableView(tableView, didSelectRowAtIndexPath:indexPath)
     case indexPath.section
       when 1
-        # info section
-        case indexPath.row
-          when 0
-            view = @profileViewController
-          when 1
-            view = @readmeViewController
-        end
-        navigationController.pushViewController(view, animated:true)
-        tableView.deselectRowAtIndexPath(indexPath, animated:false)
+      # repositry section
+      case indexPath.row
+      when 0
+        view = @readmeViewController
+      when 1
+        view = @issueTableViewController
+      end
+
+      when 2
+      # info section
+      case indexPath.row
+      when 0
+        view = @profileViewController
+      end
     end
+
+    navigationController.pushViewController(view, animated:true)
+    tableView.deselectRowAtIndexPath(indexPath, animated:false)
   end
 
   def actionButton
