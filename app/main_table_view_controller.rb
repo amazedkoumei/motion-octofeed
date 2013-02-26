@@ -179,7 +179,7 @@ class MainTableViewController < UITableViewController
   # BW::RSSParser delegate
   def when_parser_errors
     finishRefresh()
-    App.alert($BAD_INTERNET_ACCESS_MESSAGE)
+    GithubManager.showAccountSettingViewController(self)
   end
 
   def hasFeedAuthInfo?
