@@ -87,7 +87,9 @@ class MainTableViewController < UITableViewController
   end
 
   def tableView(tableView, heightForRowAtIndexPath:indexPath)
-    80
+    key = @parsedHash.keys[indexPath.section]
+    feed = @parsedHash[key][indexPath.row]
+    MainTableViewCell.contentHeight(feed[:title])
   end
 
   def tableView(tableView, titleForHeaderInSection:section)
