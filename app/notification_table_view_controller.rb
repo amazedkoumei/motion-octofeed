@@ -25,7 +25,6 @@ class NotificationTableViewController < UITableViewController
 
   def viewWillAppear(animated)
     super
-    tabBarController.tabBar.setHidden(false)
     navigationController.setToolbarHidden(true, animated:false)
     tableView.reloadData()
 
@@ -100,9 +99,9 @@ class NotificationTableViewController < UITableViewController
       @detailView = DetailViewController.new.tap do |v|
         v.initWithStyle(UITableViewStyleGrouped)
         v.url_string = json[:html_url]
+        v.hidesBottomBarWhenPushed = true
       end
       AMP::InformView.hide(true)
-      tabBarController.tabBar.setHidden(true)
       navigationController.pushViewController(@detailView, animated:true)
       tableView.deselectRowAtIndexPath(indexPath, animated:false)
     end

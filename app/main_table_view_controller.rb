@@ -26,7 +26,6 @@ class MainTableViewController < UITableViewController
 
   def viewWillAppear(animated)
     super
-    tabBarController.tabBar.setHidden(false)
     navigationController.setToolbarHidden(true, animated:false)
     if(@parsedHash.nil?)
       refresh()
@@ -81,8 +80,8 @@ class MainTableViewController < UITableViewController
       v.initWithStyle(UITableViewStyleGrouped)
       key = @parsedHash.keys[indexPath.section]
       v.url_string = @parsedHash[key][indexPath.row][:link]
+      v.hidesBottomBarWhenPushed = true
     end
-    tabBarController.tabBar.setHidden(true)
     navigationController.pushViewController(@detailView, animated:true)
     tableView.deselectRowAtIndexPath(indexPath, animated:false)
   end
