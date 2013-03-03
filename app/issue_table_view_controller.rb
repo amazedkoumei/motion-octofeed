@@ -80,7 +80,8 @@ class IssueTableViewController < UITableViewController
   end
 
   def tableView(tableView, heightForRowAtIndexPath:indexPath)
-    80
+    issue = @json[indexPath.row]
+    IssueTableViewCell.contentHeight(issue[:title])
   end
 
   def refresh()

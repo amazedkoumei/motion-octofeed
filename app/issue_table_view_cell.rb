@@ -3,6 +3,14 @@ class IssueTableViewCell < AMP::SmoothTableViewCell
 
   attr_accessor :dataSource
 
+  CONTENT_WIDTH = 250
+  
+  def self.contentHeight(title)
+    size = UIView.textContetSize(title, width:CONTENT_WIDTH, height:20000, font:UIFont.fontWithName("Helvetica", size:14), lineBreakMode:NSLineBreakByWordWrapping)    
+    height = 30 + size.height + 20
+    [height, 80].max
+  end
+
   def draw(rect)
     UIColor.grayColor.setFill()
     commentsRect = rect;
@@ -41,7 +49,7 @@ class IssueTableViewCell < AMP::SmoothTableViewCell
 
     UIColor.blackColor.setFill()      
     titleRect = rect
-    titleRect = [[50, 30], [250, 80]]
+    titleRect = [[50, 30], [CONTENT_WIDTH, 80]]
     @titleFont ||= begin
       UIFont.fontWithName("Helvetica", size:14)
     end
