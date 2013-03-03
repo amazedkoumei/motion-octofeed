@@ -13,15 +13,15 @@ class GithubManager
 
   def initialize(url_string, delegate)
     @delegate = delegate
-
-    @url_string = url_string
-    @url = NSURL.URLWithString(@url_string)
-    @path = @url.path.slice(1, @url.path.length - 1)
-    @path = @path + "#" + @url.fragment unless @url.fragment.nil?
-    @owner, @repo = urlToOwnerAndRepo(@url)
+    unless url_string.nil?
+      @url_string = url_string
+      @url = NSURL.URLWithString(@url_string)
+      @path = @url.path.slice(1, @url.path.length - 1)
+      @path = @path + "#" + @url.fragment unless @url.fragment.nil?
+      @owner, @repo = urlToOwnerAndRepo(@url)
+    end
     @api = AMP::GithubAPI.instance
     def @api.errorAction(response, query)
-      p response.status_code
       App.notification_center.post ERROR_NOTIFICATION
     end
   end

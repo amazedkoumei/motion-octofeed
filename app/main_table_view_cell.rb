@@ -8,6 +8,11 @@ class MainTableViewCell < AMP::SmoothTableViewCell
   #CONTENT_FONT = UIFont.systemFontOfSize(14)
   #CONTENT_LINE_BREAK_MODE = NSLineBreakByWordWrapping
 
+  def self.contentHeight(title)
+    size = UIView.textContetSize(title, width:CONTENT_WIDTH, height:20000, font:UIFont.systemFontOfSize(14), lineBreakMode:NSLineBreakByWordWrapping)    
+    height = 30 + size.height + 20
+  end
+  
   def draw(rect)
     if(!@dataSource.nil?)
 
@@ -59,8 +64,4 @@ class MainTableViewCell < AMP::SmoothTableViewCell
     end
   end
 
-  def self.contentHeight(title)
-    size = UIView.textContetSize(title, width:CONTENT_WIDTH, height:20000, font:UIFont.systemFontOfSize(14), lineBreakMode:NSLineBreakByWordWrapping)    
-    height = 30 + size.height + 20
-  end
 end

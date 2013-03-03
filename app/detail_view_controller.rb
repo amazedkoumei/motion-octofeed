@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 class DetailViewController < UITableViewController
 
-  attr_accessor :item, :isHaveToRefresh
+  attr_accessor :url_string, :isHaveToRefresh
   
   def viewDidLoad()
     super
 
-    @url_string = item[:link]
     navigationItem.title = @url_string
 
     @manager = GithubManager.new(@url_string, self)
@@ -119,7 +118,7 @@ class DetailViewController < UITableViewController
           l.text = @url_string
           l.when_tapped do
             view = WebViewController.new.tap do |v|
-              v.item = @item
+              v.url_string = @url_string
               navigationController.pushViewController(v, animated:true)
             end
           end

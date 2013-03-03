@@ -26,6 +26,7 @@ class MainTableViewController < UITableViewController
 
   def viewWillAppear(animated)
     super
+    tabBarController.tabBar.setHidden(false)
     navigationController.setToolbarHidden(true, animated:false)
     if(@parsedHash.nil?)
       refresh()
@@ -49,7 +50,6 @@ class MainTableViewController < UITableViewController
     end
   end
 
-  CELLID = "feed"
   def tableView(tableView, cellForRowAtIndexPath:indexPath)
     
     key = @parsedHash.keys[indexPath.section]
@@ -80,8 +80,9 @@ class MainTableViewController < UITableViewController
     @detailView = DetailViewController.new.tap do |v|
       v.initWithStyle(UITableViewStyleGrouped)
       key = @parsedHash.keys[indexPath.section]
-      v.item = @parsedHash[key][indexPath.row]
+      v.url_string = @parsedHash[key][indexPath.row][:link]
     end
+    tabBarController.tabBar.setHidden(true)
     navigationController.pushViewController(@detailView, animated:true)
     tableView.deselectRowAtIndexPath(indexPath, animated:false)
   end
@@ -100,7 +101,6 @@ class MainTableViewController < UITableViewController
 
   def refresh()
     begin
-      #@informView.showWithAnimation(false)
       AMP::InformView.show("loading..", target:navigationController.view, animated:true)
 
       token = App::Persistence[$USER_DEFAULTS_KEY_FEED_TOKEN] || ""
@@ -167,7 +167,6 @@ class MainTableViewController < UITableViewController
     if @refreshControl.isRefreshing == true
       @refreshControl.endRefreshing()
     end
-    #@informView.hideWithAnimation(true)
     AMP::InformView.hide(true)
   end
 

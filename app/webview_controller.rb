@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 class WebViewController < UIViewController
   
-  attr_accessor :item, :isHaveToRefresh
+  attr_accessor :url_string, :isHaveToRefresh
  
   def viewDidLoad()
     super
 
-    @item = item
-    @url_string = item[:link]
     navigationItem.title = @url_string
 
     @manager = GithubManager.new(@url_string, self)
