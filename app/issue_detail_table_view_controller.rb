@@ -7,7 +7,7 @@ class IssueDetailTableViewController < UITableViewController
     super
     
     view.dataSource = view.delegate = self
-    navigationItem.title = "#{@manager.repo}/issues"
+    navigationItem.title = "issue##{@issue[:number]}"
 
     @refreshControl = UIRefreshControl.new.tap do |r|
       r.attributedTitle = NSAttributedString.alloc.initWithString("now refreshing...")

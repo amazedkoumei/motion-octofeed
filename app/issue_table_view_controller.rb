@@ -75,6 +75,10 @@ class IssueTableViewController < UITableViewController
       v.manager = @manager
       v.issue = @json[indexPath.row]
     end
+    backButton = UIBarButtonItem.new.tap do |b|
+      b.title = "issues"
+      tabBarController.navigationItem.backBarButtonItem = b
+    end    
     navigationController.pushViewController(@detailView, animated:true)
     tableView.deselectRowAtIndexPath(indexPath, animated:false)
   end
