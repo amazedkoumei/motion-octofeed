@@ -8,8 +8,8 @@ class IssueTableViewController < UITableViewController
     super
     
     view.dataSource = view.delegate = self
-    navigationItem.title = "#{@manager.repo}/issues" unless navigationItem.nil?
-    tabBarController.title = "#{@manager.repo}/issues" unless tabBarController.nil?
+    navigationItem.title = "issues/#{@manager.repo}" unless navigationItem.nil?
+    tabBarController.title = "issues/#{@manager.repo}" unless tabBarController.nil?
 
     @refreshControl = UIRefreshControl.new.tap do |r|
       r.attributedTitle = NSAttributedString.alloc.initWithString("now refreshing...")

@@ -222,6 +222,10 @@ class DetailViewController < UITableViewController
       end
     end
 
+    backButton = UIBarButtonItem.new.tap do |b|
+      b.title = "back"
+      navigationItem.backBarButtonItem = b
+    end
     navigationController.pushViewController(view, animated:true)
     tableView.deselectRowAtIndexPath(indexPath, animated:false)
   end
