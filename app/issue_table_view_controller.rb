@@ -110,7 +110,7 @@ class IssueTableViewController < UITableViewController
   end
 
   def finishRefresh()
-    view.reloadData
+    tableView.reloadData()
     if @refreshControl.isRefreshing == true
       @refreshControl.endRefreshing()
     end

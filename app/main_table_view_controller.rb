@@ -173,7 +173,7 @@ class MainTableViewController < UITableViewController
   def when_parser_is_done
     finishRefresh()
     @parsedHash = @parsingHash.clone
-    view.reloadData
+    tableView.reloadData()
   end
 
   # BW::RSSParser delegate
