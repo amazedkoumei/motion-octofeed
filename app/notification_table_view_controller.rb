@@ -127,8 +127,8 @@ class NotificationTableViewController < UITableViewController
       }
       @manager.api.getNotifications(payload) do |response|
         if response.ok?
-          @json = BW::JSON.parse(response.body)
-          @json = reHash(@json)
+          json = BW::JSON.parse(response.body)
+          @json = reHash(json)
           finishRefresh()
         end
       end
