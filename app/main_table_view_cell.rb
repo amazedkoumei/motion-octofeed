@@ -39,7 +39,7 @@ class MainTableViewCell < AMP::SmoothTableViewCell
       # icon
       # FIXME: DRY: MainTableViewController.fetchFeed()
       # input > https://secure.gravatar.com/avatar/[:fileName]?s=30&;d=[:original image url]
-      /.+?\/avatar\/(.+?)\?s=30.*/ =~ @dataSource[:thumbnail]
+      /.+?\/avatar\/(.+?)\?.*/ =~ @dataSource[:thumbnail]
       fileName = $1 + ".png"
       fileManager = NSFileManager.defaultManager()
       filePath = "#{App.documents_path}/#{fileName}"

@@ -109,7 +109,6 @@ class MainTableViewController < UITableViewController
       @feed_parser = BW::RSSParserForGithub.new(@url)
       @feed_parser.delegate = self
 
-
       @parsingHash = Hash.new.tap do |hash|
         @feed_parser.parse do |item|
           inputFormatter ||=begin
@@ -138,7 +137,7 @@ class MainTableViewController < UITableViewController
           feed[:time] = time
           
           # url > https://secure.gravatar.com/avatar/[:fileName]?s=30&;d=[:original image url]
-          /.+?\/avatar\/(.+?)\?s=30.*/ =~ feed[:thumbnail]
+          /.+?\/avatar\/(.+?)\?.*/ =~ feed[:thumbnail]
           fileName = $1 + ".png"
           fileManager = NSFileManager.defaultManager()
           filePath = "#{App.documents_path}/#{fileName}"
