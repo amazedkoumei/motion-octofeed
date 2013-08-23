@@ -19,6 +19,10 @@ Motion::Project::App.setup do |app|
   app.icons = ["iTunesArtwork.png", "Icon.png", "Icon@2x.png", "Icon-72.png", "Icon-Small.png", "Icon-Small-50.png", "Icon-Small@2x.png","Default.png"]
   app.prerendered_icon = false
 
+  app.pods do
+    pod "AFNetworking", "~> 1.3"
+  end
+
   if File.exists?('./config.yml')
     config = YAML::load_file('./config.yml')
 

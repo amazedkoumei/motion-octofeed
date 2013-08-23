@@ -12,7 +12,12 @@ class MainTableViewCell < AMP::SmoothTableViewCell
     size = UIView.textContetSize(title, width:CONTENT_WIDTH, height:20000, font:UIFont.systemFontOfSize(14), lineBreakMode:NSLineBreakByWordWrapping)    
     height = 30 + size.height + 20
   end
-  
+
+  def layoutSubviews()
+    self.contentView.frame = self.bounds
+    self.imageView.frame = [[10, 30], [30, 30]]
+  end
+
   def draw(rect)
     if(!@dataSource.nil?)
 
@@ -39,28 +44,8 @@ class MainTableViewCell < AMP::SmoothTableViewCell
       # icon
       # FIXME: DRY: MainTableViewController.fetchFeed()
       # input > https://secure.gravatar.com/avatar/[:fileName]?s=30&;d=[:original image url]
-      /.+?\/avatar\/(.+?)\?.*/ =~ @dataSource[:thumbnail]
-      fileName = $1 + ".png"
-      fileManager = NSFileManager.defaultManager()
-      filePath = "#{App.documents_path}/#{fileName}"
-      if fileManager.fileExistsAtPath(filePath)
-        if @dataSource[:thumbnailImage].nil?
-          @dataSource[:thumbnailImage] = UIImage.imageWithContentsOfFile(filePath)
-        end
-
-        img_rect = CGRectMake(0, 0, 30, 30)
-        #UIGraphicsBeginImageContext(img_rect.size)
-        UIGraphicsBeginImageContextWithOptions(img_rect.size, false, 2.0);
-        @dataSource[:thumbnailImage].drawInRect(img_rect)
-        @dataSource[:thumbnailImage] = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext();
-        @dataSource[:thumbnailImage].drawAtPoint(CGPointMake(10, 30))
-      else
-        # reason of calling Dispatch::Queue is that other thread is downloading images
-        Dispatch::Queue.concurrent.async{
-          self.setNeedsDisplay()
-        }
-      end
+      self.imageView.setImageWithURL(NSURL.URLWithString(@dataSource[:thumbnail]), placeholderImage:nil)
+      #p "title: #{@dataSource[:title]} thumb: #{@dataSource[:thumbnail]}"
     end
   end
 

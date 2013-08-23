@@ -136,19 +136,6 @@ class MainTableViewController < UITableViewController
           feed[:date] = date
           feed[:time] = time
           
-          # url > https://secure.gravatar.com/avatar/[:fileName]?s=30&;d=[:original image url]
-          /.+?\/avatar\/(.+?)\?.*/ =~ feed[:thumbnail]
-          fileName = $1 + ".png"
-          fileManager = NSFileManager.defaultManager()
-          filePath = "#{App.documents_path}/#{fileName}"
-          if !fileManager.fileExistsAtPath(filePath)
-            Dispatch::Queue.concurrent.async{
-              thumbnailData = NSData.dataWithContentsOfURL(NSURL.URLWithString(feed[:thumbnail]))
-              thumbnailData.writeToFile(filePath, atomically:false)
-            }
-          end
-
-
           hash[date] ||= begin
             Array.new
           end
