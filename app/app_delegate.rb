@@ -14,13 +14,16 @@ class AppDelegate
       viewControllers = [
         UINavigationController.new.tap do |nv|
           MainTableViewController.new.tap do |sv|
-            sv.tabBarItem = UITabBarItem.new.initWithTitle("Feed", image:UIImage.imageNamed("tabbar_feed.png"), tag:0)
+            # see http://stackoverflow.com/questions/5676656/uitabbaritem-image-size-in-retina-display
+            image = UIImage.imageWithCGImage(UIImage.imageNamed("tabbar_feed.png").CGImage, scale:2.0, orientation:UIImageOrientationUp)
+            sv.tabBarItem = UITabBarItem.new.initWithTitle("Feed", image:image, tag:0)
             nv.initWithRootViewController(sv)
           end
         end,
         UINavigationController.new.tap do |nv|
           NotificationTableViewController.new.tap do |sv|
-            sv.tabBarItem = UITabBarItem.new.initWithTitle("Notification", image:UIImage.imageNamed("tabbar_notification.png"), tag:1)
+            image = UIImage.imageWithCGImage(UIImage.imageNamed("tabbar_notification.png").CGImage, scale:2.0, orientation:UIImageOrientationUp)
+            sv.tabBarItem = UITabBarItem.new.initWithTitle("Notification", image:image, tag:1)
             nv.initWithRootViewController(sv)
           end
         end
