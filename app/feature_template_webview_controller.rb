@@ -9,7 +9,7 @@ class FeatureTemplateWebViewController < UIViewController
   end
 
   def parseBeforeDidLoad()
-    @url = url
+    @url = url + "?mobile=0"
     @parsingWebview = UIWebView.new.tap do |v|
       v.loadRequest(NSURLRequest.requestWithURL(NSURL.URLWithString(@url)))
       v.delegate = self
@@ -19,7 +19,7 @@ class FeatureTemplateWebViewController < UIViewController
   def viewDidLoad()
     super
 
-    @url = url
+    @url = url + "?mobile=0"
     navigationItem.title = navTitle
     navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
 
