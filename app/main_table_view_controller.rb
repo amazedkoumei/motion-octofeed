@@ -14,7 +14,7 @@ class MainTableViewController < UITableViewController
       image = UIImage.imageNamed("btn_cog_32.png")
       b.setBackgroundImage(image, forState:UIControlStateNormal)
       b.addTarget(self, action:"settingButton", forControlEvents:UIControlEventTouchUpInside)
-      
+
       buttonItem = UIBarButtonItem.new.tap do |bi|
         bi.initWithCustomView(b)
         navigationItem.rightBarButtonItem = bi
@@ -75,6 +75,7 @@ class MainTableViewController < UITableViewController
   end
 
   def tableView(tableView, didSelectRowAtIndexPath:indexPath)
+=begin
     # App will crash if @detailView release before "@github.fetchGithubStatus" callend in DetailViewController have not finished
     @detailViewStack ||= []
     if @detailViewStack.size < 5
@@ -91,6 +92,13 @@ class MainTableViewController < UITableViewController
       v.hidesBottomBarWhenPushed = true
     end
     navigationController.pushViewController(@detailView, animated:true)
+=end
+    @webView = WebViewController.new.tap do |v|
+      key = @parsedHash.keys[indexPath.section]
+      v.url_string = @parsedHash[key][indexPath.row][:link] + "?mobile=1"
+      v.hidesBottomBarWhenPushed = true
+      navigationController.pushViewController(v, animated:true)
+    end
     tableView.deselectRowAtIndexPath(indexPath, animated:false)
   end
 
