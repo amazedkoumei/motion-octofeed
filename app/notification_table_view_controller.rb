@@ -9,10 +9,18 @@ class NotificationTableViewController < UITableViewController
     navigationItem.title = App.name
     navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
 
-    @settingButton = UIBarButtonItem.new.tap do |b|
-      b.initWithTitle("setting", style:UIBarButtonItemStylePlain, target:self, action:"settingButton")
-      navigationItem.rightBarButtonItem = b
-    end
+    @settingButton = UIButton.new.tap do |b|
+      b.frame = [[0, 0], [20, 20]]
+
+      image = UIImage.imageNamed("btn_cog_32.png")
+      b.setBackgroundImage(image, forState:UIControlStateNormal)
+      b.addTarget(self, action:"settingButton", forControlEvents:UIControlEventTouchUpInside)
+      
+      buttonItem = UIBarButtonItem.new.tap do |bi|
+        bi.initWithCustomView(b)
+        navigationItem.rightBarButtonItem = bi
+      end
+    end 
 
     @manager = GithubManager.new(nil, self)
 
