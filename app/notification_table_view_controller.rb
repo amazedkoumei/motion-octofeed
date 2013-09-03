@@ -6,7 +6,7 @@ class NotificationTableViewController < UITableViewController
     
     view.dataSource = view.delegate = self
 
-    navigationItem.title = App.name
+    navigationItem.title = "Notifications"
     navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
 
     @settingButton = UIButton.new.tap do |b|

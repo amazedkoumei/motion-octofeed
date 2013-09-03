@@ -5,7 +5,7 @@ class MainTableViewController < UITableViewController
     super
     
     view.dataSource = view.delegate = self
-    navigationItem.title = App.name
+    navigationItem.title = "News Feed"
     navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
 
     @settingButton = UIButton.new.tap do |b|
