@@ -33,6 +33,15 @@ class MainTableViewCell < AMP::SmoothTableViewCell
       end
       @dataSource[:title].drawInRect(titleRect, withFont:titleFont, lineBreakMode:NSLineBreakByWordWrapping)
 
+      # type
+      /<!--(.+?)-->/ =~ @dataSource[:content]
+      type = $1.strip.gsub(/_/, " ")
+      typeRect = [[10, 10], [CONTENT_WIDTH - (320 - CONTENT_WIDTH), 10]]
+      @typeFont ||= begin
+        UIFont.fontWithName("Helvetica-Bold", size:12)
+      end
+      "[#{type}]".drawInRect(typeRect, withFont:@typeFont, lineBreakMode:NSLineBreakByWordWrapping)
+      
       # time
       UIColor.grayColor.setFill()
       timeRect = [[CONTENT_WIDTH, 10], [320 - CONTENT_WIDTH, 10]]
