@@ -78,6 +78,15 @@ class FeatureTemplateWebViewController < UIViewController
       if !@displayWebview.nil?
         @displayWebview.loadHTMLString(@content, baseURL:nil)
       end
+
+      # rewrite cookie for keeping mobile view on webview
+      if @rewriteCookiewebview.nil?
+        @rewriteCookiewebview = UIWebView.new.tap do |v|
+          v.frame = self.view.bounds
+          v.delegate = self
+        end
+      end
+      @rewriteCookiewebview.loadRequest(NSURLRequest.requestWithURL(NSURL.URLWithString("https://github.com/?mobile=1")))
     end      
   end
 

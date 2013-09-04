@@ -30,7 +30,7 @@ class DetailViewController < UITableViewController
       v.url = "https://" + @manager.url.host + "/" + @manager.owner
       v.navTitle = "#{@manager.owner}"
       v.hideDoneButton = true
-      v.parseBeforeDidLoad()
+      #v.parseBeforeDidLoad()
     end
 
     @issueTableViewController = UITabBarController.new.tap do |v|

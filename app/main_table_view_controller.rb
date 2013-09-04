@@ -95,7 +95,7 @@ class MainTableViewController < UITableViewController
 =end
     @webView = WebViewController.new.tap do |v|
       key = @parsedHash.keys[indexPath.section]
-      v.url_string = @parsedHash[key][indexPath.row][:link] + "?mobile=1"
+      v.url_string = @parsedHash[key][indexPath.row][:link]
       v.hidesBottomBarWhenPushed = true
       navigationController.pushViewController(v, animated:true)
     end

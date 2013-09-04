@@ -150,13 +150,12 @@ class WebViewController < UIViewController
       @readmeViewController = FeatureReadmeViewController.new.tap do |v|
         v.url = "https://" + @manager.url.host + "/" + @manager.owner + "/" + @manager.repo
         v.navTitle = "#{@manager.owner}/#{@manager.repo}"
-        v.parseBeforeDidLoad()
+        #v.parseBeforeDidLoad()
         @readmeItem.enabled = true
       end
     end
   end
 
-  # UIWebViewDelegate
   def webView(webView, didFailLoadWithError:error)
     UIApplication.sharedApplication.networkActivityIndicatorVisible = false
     App.alert($BAD_INTERNET_ACCESS_MESSAGE_FOR_WEBVIEW)
