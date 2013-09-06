@@ -12,7 +12,7 @@ Motion::Project::App.setup do |app|
   app.version = '1.0.4'
   app.info_plist['CFBundleShortVersionString'] = '1.0.4'
   app.frameworks += ["MessageUI"]
-  app.sdk_version = "6.1"
+  app.sdk_version = "7.0"
   app.deployment_target = "6.0"
   app.device_family = [:iphone]
   app.interface_orientations = [:portrait]
@@ -52,4 +52,8 @@ Motion::Project::App.setup do |app|
       app.seed_id = config['release']['seed_id']
     end
   end
+
+  # for ios7 simulater
+  app.xcode_dir = "/Applications/Xcode5-DP6.app/Contents/Developer"
+
 end
