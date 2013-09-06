@@ -6,8 +6,6 @@ class WebViewController < UIViewController
   def viewDidLoad()
     super
 
-    navigationItem.title = @url_string
-
     @manager = GithubManager.new(@url_string, self)
 
     @webview = UIWebView.new.tap do |v|
@@ -144,7 +142,7 @@ class WebViewController < UIViewController
     
     @url_string = webView.request.URL.absoluteString
     @manager = GithubManager.new(@url_string, self)
-    navigationItem.title = @url_string
+    navigationItem.title = webView.stringByEvaluatingJavaScriptFromString("document.title")
     @manager.fetchGithubStatus()
     if @manager.isGithubRepository?
       @readmeViewController = FeatureReadmeViewController.new.tap do |v|
