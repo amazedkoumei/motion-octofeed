@@ -11,7 +11,12 @@ class DetailViewController < UITableViewController
     @manager = GithubManager.new(@url_string, self)
 
     navigationItem.title = "#{@manager.owner}/#{@manager.repo}"
+    navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
 
+    @doneButton = UIBarButtonItem.new.tap do |b|
+      b.initWithTitle("done", style:UIBarButtonItemStylePlain, target:self, action:"doneButton")
+      navigationItem.rightBarButtonItem = b
+    end
 
     @toolbarItems = Array.new.tap do |a|
       @actionItem = UIBarButtonItem.new.tap do |i|
@@ -277,6 +282,9 @@ class DetailViewController < UITableViewController
     end
   end
 
+  def doneButton
+    dismissViewControllerAnimated(true, completion:nil)
+  end
 
   # GithubManager delegate
   def githubFetchDidFinish()
