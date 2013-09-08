@@ -43,13 +43,19 @@ class DetailViewController < UITableViewController
         IssueTableViewController.new.tap do |sv|
           # display open issue
           sv.manager = @manager
-          sv.tabBarItem = UITabBarItem.new.initWithTitle("Open", image:nil, tag:0)
+          sv.tabBarItem = UITabBarItem.new.tap do |ti|
+            image = UIImage.imageWithCGImage(UIImage.imageNamed("tabbar_open.png").CGImage, scale:2.0, orientation:UIImageOrientationUp)            
+            ti.initWithTitle("Open", image:image, tag:0)
+          end
         end,
         IssueTableViewController.new.tap do |sv|
           # display closed issue
           sv.manager = @manager
           sv.state = "closed"
-          sv.tabBarItem = UITabBarItem.new.initWithTitle("Closed", image:nil, tag:1)
+          sv.tabBarItem = UITabBarItem.new.tap do |ti|
+            image = UIImage.imageWithCGImage(UIImage.imageNamed("tabbar_close.png").CGImage, scale:2.0, orientation:UIImageOrientationUp)            
+            ti.initWithTitle("Closed", image:image, tag:1)
+          end
         end
       ]
     end
