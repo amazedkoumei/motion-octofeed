@@ -104,13 +104,12 @@ class NotificationTableViewController < UITableViewController
 
     @manager.api.request(@json[key][indexPath.row][:subject][:url]) do |response, query|
       json = BW::JSON.parse(response.body)
-      @detailView = DetailViewController.new.tap do |v|
-        v.initWithStyle(UITableViewStyleGrouped)
+      AMP::InformView.hide(true)
+      @webView = WebViewController.new.tap do |v|
         v.url_string = json[:html_url]
         v.hidesBottomBarWhenPushed = true
+        navigationController.pushViewController(v, animated:true)
       end
-      AMP::InformView.hide(true)
-      navigationController.pushViewController(@detailView, animated:true)
       tableView.deselectRowAtIndexPath(indexPath, animated:false)
     end
   end
