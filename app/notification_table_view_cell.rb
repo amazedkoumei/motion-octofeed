@@ -3,7 +3,7 @@ class NotificationTableViewCell < AMP::SmoothTableViewCell
 
   attr_accessor :dataSource
 
-  CONTENT_WIDTH = 250
+  CONTENT_WIDTH = 230
 
   def self.contentHeight(title)
     size = UIView.textContetSize(title, width:CONTENT_WIDTH, height:20000, font:UIFont.fontWithName("Helvetica", size:14), lineBreakMode:NSLineBreakByWordWrapping)    
@@ -21,7 +21,7 @@ class NotificationTableViewCell < AMP::SmoothTableViewCell
     end
     typeRect = rect;
     typeSize = UIView.textContetSize(type, width:CONTENT_WIDTH, height:20000, font:@typeFont, lineBreakMode:NSLineBreakByWordWrapping)    
-    typeRect = [[320 - typeSize.width - 25, 10], [typeSize.width, 10]]
+    typeRect = [[320 - typeSize.width - 35, 10], [typeSize.width, 10]]
     "#{type}".drawInRect(typeRect, withFont:@typeFont, lineBreakMode:NSLineBreakByWordWrapping)
 
     # time
