@@ -88,16 +88,14 @@ class DetailViewController < UITableViewController
   end
 
   def numberOfSectionsInTableView(tableView)
-    3
+    2
   end
 
   def tableView(tableView, numberOfRowsInSection:section)
     case section
       when 0
-        0
-      when 1
         2
-      when 2
+      when 1
         1
     end
   end
@@ -105,14 +103,13 @@ class DetailViewController < UITableViewController
   def tableView(tableView, titleForHeaderInSection:section)
     case section
       when 0
-        "URL"
-      when 1
         "Repository: #{@manager.repo}"
-      when 2
+      when 1
         "Owner: #{@manager.owner}"
     end
   end
 
+=begin
   def tableView(tableView, viewForFooterInSection:section)
     if section == 0
       view = UIView.new.tap do |v|
@@ -148,6 +145,7 @@ class DetailViewController < UITableViewController
       -1
     end
   end
+=end
 
   CELLID = "detailmenu"
   def tableView(tableView, cellForRowAtIndexPath:indexPath)
@@ -160,7 +158,7 @@ class DetailViewController < UITableViewController
     end
 
     case indexPath.section
-      when 1
+      when 0
       # Repository section
       case indexPath.row
       when 0
@@ -197,7 +195,7 @@ class DetailViewController < UITableViewController
         end
       end
 
-      when 2
+      when 1
       # info section
       case indexPath.row
       when 0
@@ -216,7 +214,7 @@ class DetailViewController < UITableViewController
 
   def tableView(tableView, didSelectRowAtIndexPath:indexPath)
     case indexPath.section
-      when 1
+      when 0
       # repositry section
       case indexPath.row
       when 0
@@ -225,7 +223,7 @@ class DetailViewController < UITableViewController
         view = @issueTableViewController
       end
 
-      when 2
+      when 1
       # info section
       case indexPath.row
       when 0
