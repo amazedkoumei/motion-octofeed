@@ -54,6 +54,6 @@ Motion::Project::App.setup do |app|
   end
 
   # for ios7 simulater
-  app.xcode_dir = "/Applications/Xcode5-DP6.app/Contents/Developer"
+  #app.xcode_dir = "/Applications/Xcode5-DP6.app/Contents/Developer"
 
 end
