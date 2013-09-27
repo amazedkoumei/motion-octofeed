@@ -6,16 +6,14 @@ class DetailViewController < UITableViewController
   def viewDidLoad()
     super
 
-    navigationItem.title = @url_string
-
     @manager = GithubManager.new(@url_string, self)
 
-    navigationItem.title = "#{@manager.owner}/#{@manager.repo}"
+    navigationItem.title = "#{@manager.repo}"
     navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
 
     @doneButton = UIBarButtonItem.new.tap do |b|
       b.initWithTitle("done", style:UIBarButtonItemStylePlain, target:self, action:"doneButton")
-      navigationItem.rightBarButtonItem = b
+      navigationItem.leftBarButtonItem = b
     end
 
     @toolbarItems = Array.new.tap do |a|
@@ -103,49 +101,11 @@ class DetailViewController < UITableViewController
   def tableView(tableView, titleForHeaderInSection:section)
     case section
       when 0
-        "Repository: #{@manager.repo}"
+        "Repository"
       when 1
-        "Owner: #{@manager.owner}"
+        "Owner"
     end
   end
-
-=begin
-  def tableView(tableView, viewForFooterInSection:section)
-    if section == 0
-      view = UIView.new.tap do |v|
-        label = UILabel.new.tap do |l|
-          l.frame = CGRectMake(20, 0, 280, 10)
-          l.backgroundColor = UIColor.clearColor
-          l.textAlignment = UITextAlignmentLeft
-          l.textColor = UIColor.blueColor
-          l.lineBreakMode = UILineBreakModeCharacterWrap
-          l.numberOfLines = 0
-          l.font = UIFont.boldSystemFontOfSize(16)
-          l.shadowColor = UIColor.whiteColor
-          l.shadowOffset = CGSizeMake(0, 1);
-          l.text = @url_string
-          l.when_tapped do
-            view = WebViewController.new.tap do |v|
-              v.url_string = @url_string
-              navigationController.pushViewController(v, animated:true)
-            end
-          end
-          l.sizeToFit()
-        end
-        v.addSubview(label)
-      end
-    end
-  end
-
-  def tableView(tableView, heightForFooterInSection:section)
-    if section == 0
-      70
-    else
-      # default height
-      -1
-    end
-  end
-=end
 
   CELLID = "detailmenu"
   def tableView(tableView, cellForRowAtIndexPath:indexPath)
