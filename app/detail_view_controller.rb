@@ -37,25 +37,32 @@ class DetailViewController < UITableViewController
     end
 
     @issueTableViewController = UITabBarController.new.tap do |v|
-      v.viewControllers = [
-        IssueTableViewController.new.tap do |sv|
-          # display open issue
-          sv.manager = @manager
-          sv.tabBarItem = UITabBarItem.new.tap do |ti|
-            image = UIImage.imageWithCGImage(UIImage.imageNamed("tabbar_open.png").CGImage, scale:2.0, orientation:UIImageOrientationUp)            
-            ti.initWithTitle("Open", image:image, tag:0)
+      viewControllers = [
+        UINavigationController.new.tap do |nv|
+          IssueTableViewController.new.tap do |sv|
+            # display open issue
+            sv.manager = @manager
+            sv.tabBarItem = UITabBarItem.new.tap do |ti|
+              image = UIImage.imageWithCGImage(UIImage.imageNamed("tabbar_open.png").CGImage, scale:2.0, orientation:UIImageOrientationUp)            
+              ti.initWithTitle("Open", image:image, tag:0)
+            end
+            nv.initWithRootViewController(sv)
           end
         end,
-        IssueTableViewController.new.tap do |sv|
-          # display closed issue
-          sv.manager = @manager
-          sv.state = "closed"
-          sv.tabBarItem = UITabBarItem.new.tap do |ti|
-            image = UIImage.imageWithCGImage(UIImage.imageNamed("tabbar_close.png").CGImage, scale:2.0, orientation:UIImageOrientationUp)            
-            ti.initWithTitle("Closed", image:image, tag:1)
+        UINavigationController.new.tap do |nv|
+          IssueTableViewController.new.tap do |sv|
+            # display closed issue
+            sv.manager = @manager
+            sv.state = "closed"
+            sv.tabBarItem = UITabBarItem.new.tap do |ti|
+              image = UIImage.imageWithCGImage(UIImage.imageNamed("tabbar_close.png").CGImage, scale:2.0, orientation:UIImageOrientationUp)            
+              ti.initWithTitle("Closed", image:image, tag:1)
+            end
+            nv.initWithRootViewController(sv)
           end
         end
       ]
+      v.setViewControllers(viewControllers, animated:false)
     end
 
     @readmeViewController = FeatureReadmeViewController.new.tap do |v|
