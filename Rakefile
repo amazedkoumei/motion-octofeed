@@ -13,10 +13,11 @@ Motion::Project::App.setup do |app|
   app.info_plist['CFBundleShortVersionString'] = '1.0.4'
   app.frameworks += ["MessageUI"]
   app.sdk_version = "7.0"
-  app.deployment_target = "6.0"
+  app.deployment_target = "7.0"
   app.device_family = [:iphone]
   app.interface_orientations = [:portrait]
-  app.icons = ["iTunesArtwork.png", "Icon.png", "Icon@2x.png", "Icon-72.png", "Icon-Small.png", "Icon-Small-50.png", "Icon-Small@2x.png","Default.png"]
+  #app.icons = ["iTunesArtwork.png", "Icon.png", "Icon@2x.png", "Icon-72.png", "Icon-Small.png", "Icon-Small-50.png", "Icon-Small@2x.png","Default.png"]
+  app.icons = ["Icon.png", "Icon@2x.png"]
   app.prerendered_icon = false
 
   app.pods do
