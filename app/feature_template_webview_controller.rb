@@ -72,7 +72,6 @@ class FeatureTemplateWebViewController < UIViewController
 
   # UIWebViewDelegate
   def webViewDidFinishLoad(webView)
-    UIApplication.sharedApplication.networkActivityIndicatorVisible = false
     if webView == @parsingWebview
       @content = featureElement(webView)
       if !@displayWebview.nil?
@@ -87,6 +86,8 @@ class FeatureTemplateWebViewController < UIViewController
         end
       end
       @rewriteCookiewebview.loadRequest(NSURLRequest.requestWithURL(NSURL.URLWithString("https://github.com/?mobile=1")))
+    elsif webView == @displayWebview
+      UIApplication.sharedApplication.networkActivityIndicatorVisible = false
     end      
   end
 
