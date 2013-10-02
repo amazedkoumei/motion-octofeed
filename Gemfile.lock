@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/amazedkoumei/am-motion-parts.git
-  revision: 78f504f390502faae9fb6a5770458cba85d646f6
+  revision: 110680b67f689ff272cb4de4bffa168a9bdbc330
   submodules: true
   specs:
     am-motion-parts (0.0.1)

@@ -43,7 +43,7 @@ class DetailViewController < UITableViewController
             # display open issue
             sv.manager = @manager
             sv.tabBarItem = UITabBarItem.new.tap do |ti|
-              image = UIImage.imageWithCGImage(UIImage.imageNamed("tabbar_open.png").CGImage, scale:2.0, orientation:UIImageOrientationUp)            
+              image = AMP::Util.imageForRetina(UIImage.imageNamed("tabbar_open.png"))            
               ti.initWithTitle("Open", image:image, tag:0)
             end
             nv.initWithRootViewController(sv)
@@ -55,7 +55,7 @@ class DetailViewController < UITableViewController
             sv.manager = @manager
             sv.state = "closed"
             sv.tabBarItem = UITabBarItem.new.tap do |ti|
-              image = UIImage.imageWithCGImage(UIImage.imageNamed("tabbar_close.png").CGImage, scale:2.0, orientation:UIImageOrientationUp)            
+              image = AMP::Util.imageForRetina(UIImage.imageNamed("tabbar_close.png"))            
               ti.initWithTitle("Closed", image:image, tag:1)
             end
             nv.initWithRootViewController(sv)

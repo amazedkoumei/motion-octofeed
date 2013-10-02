@@ -37,7 +37,7 @@ class WebViewController < UIViewController
       end
 
       @infoItem = UIBarButtonItem.new.tap do |i|
-        image = UIImage.imageWithCGImage(UIImage.imageNamed("toolbar_info.png").CGImage, scale:2.0, orientation:UIImageOrientationUp)
+        image = AMP::Util.imageForRetina(UIImage.imageNamed("toolbar_info.png"))
         i.initWithImage(image, style:UIBarButtonItemStylePlain, target:self, action:"infoButton")
       end
 
