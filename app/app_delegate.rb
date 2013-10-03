@@ -10,24 +10,26 @@ class AppDelegate
   def application(application, didFinishLaunchingWithOptions:launchOptions)
     application.setStatusBarStyle(UIStatusBarStyleBlackOpaque)
 
-    @tabBarController = UITabBarController.new.tap do |v|
+    @tabBarController = UITabBarController.new.tap do |tab|
       viewControllers = [
-        UINavigationController.new.tap do |nv|
-          MainTableViewController.new.tap do |sv|
+        # UINavigationController exists for keeping tableview layout in tabbarController
+        UINavigationController.new.tap do |nav|
+          MainTableViewController.new.tap do |v|
             image = AMP::Util.imageForRetina(UIImage.imageNamed("tabbar_feed.png"))
-            sv.tabBarItem = UITabBarItem.new.initWithTitle("Feed", image:image, tag:0)
-            nv.initWithRootViewController(sv)
+            v.tabBarItem = UITabBarItem.new.initWithTitle("Feed", image:image, tag:0)
+            nav.initWithRootViewController(v)
           end
         end,
-        UINavigationController.new.tap do |nv|
-          NotificationTableViewController.new.tap do |sv|
+        # UINavigationController exists for keeping tableview layout in tabbarController
+        UINavigationController.new.tap do |nav|
+          NotificationTableViewController.new.tap do |v|
             image = AMP::Util.imageForRetina(UIImage.imageNamed("tabbar_notification.png"))
-            sv.tabBarItem = UITabBarItem.new.initWithTitle("Notification", image:image, tag:1)
-            nv.initWithRootViewController(sv)
+            v.tabBarItem = UITabBarItem.new.initWithTitle("Notification", image:image, tag:1)
+            nav.initWithRootViewController(v)
           end
         end
       ]
-      v.setViewControllers(viewControllers, animated:false)
+      tab.setViewControllers(viewControllers, animated:false)
     end
 
     @window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)

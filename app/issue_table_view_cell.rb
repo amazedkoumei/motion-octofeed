@@ -17,49 +17,33 @@ class IssueTableViewCell < AMP::SmoothTableViewCell
   end
 
   def draw(rect)
+
+    # comment
     UIColor.grayColor.setFill()
-    commentsRect = rect;
     commentsRect = [[230, 10], [rect.size.width, 10]]
-    @commentsFont ||= begin
+    commentsFont ||= begin
       UIFont.fontWithName("Helvetica", size:12)
     end
-    "#{@dataSource[:comments]} comments".drawInRect(commentsRect, withFont:@commentsFont, lineBreakMode:NSLineBreakByWordWrapping)
+    "#{@dataSource[:comments]} comments".drawInRect(commentsRect, withFont:commentsFont, lineBreakMode:NSLineBreakByWordWrapping)
 
-    timeRect = rect;
+    # time
+    UIColor.grayColor.setFill()
     timeRect = [[10, 10], [rect.size.width, 10]]
-    @timeFont ||= begin
+    timeFont ||= begin
       UIFont.fontWithName("Helvetica", size:12)
     end
-    inputFormatter ||=begin
-      f = NSDateFormatter.new
-      f.setTimeZone(NSTimeZone.timeZoneWithAbbreviation("GMT"))
-      f.setDateFormat("YYYY'-'MM'-'dd'T'HH':'mm':'ss'Z'")
-    end
-    outputDateFormatter ||=begin
-      f = NSDateFormatter.new
-      f.setLocale(NSLocale.systemLocale)
-      f.setTimeZone(NSTimeZone.systemTimeZone)
-      f.setDateFormat("YYYY-MM-dd")
-    end
-    outputTimeFormatter ||=begin
-      f = NSDateFormatter.new
-      f.setLocale(NSLocale.systemLocale)
-      f.setTimeZone(NSTimeZone.systemTimeZone)
-      f.setDateFormat("HH:mm:ss")
-    end
-    nsDate = inputFormatter.dateFromString(@dataSource[:updated_at])
-    date = outputDateFormatter.stringFromDate(nsDate)
-    time = outputTimeFormatter.stringFromDate(nsDate)    
-    "##{@dataSource[:number]} - #{date} #{time}".drawInRect(timeRect, withFont:@timeFont, lineBreakMode:NSLineBreakByWordWrapping)
+    date = AMP::Util.dateFormatter(@dataSource[:updated_at], "YYYY'-'MM'-'dd'T'HH':'mm':'ss'Z'", "YYYY-MM-dd HH:mm:ss")
+    "##{@dataSource[:number]} - #{date}".drawInRect(timeRect, withFont:timeFont, lineBreakMode:NSLineBreakByWordWrapping)
 
+    # title
     UIColor.blackColor.setFill()      
-    titleRect = rect
     titleRect = [[50, 30], [CONTENT_WIDTH, 80]]
-    @titleFont ||= begin
+    titleFont ||= begin
       UIFont.fontWithName("Helvetica", size:14)
     end
-    @dataSource[:title].drawInRect(titleRect, withFont:@titleFont, lineBreakMode:NSLineBreakByWordWrapping)
+    @dataSource[:title].drawInRect(titleRect, withFont:titleFont, lineBreakMode:NSLineBreakByWordWrapping)
 
+    # icon
     self.imageView.setImageWithURL(NSURL.URLWithString(@dataSource[:user][:avatar_url]), placeholderImage:nil)
   end
 end

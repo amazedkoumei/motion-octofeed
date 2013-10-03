@@ -98,19 +98,19 @@ class DetailViewController < UITableViewController
 
   def tableView(tableView, numberOfRowsInSection:section)
     case section
-      when 0
-        2
-      when 1
-        1
+    when 0
+      2
+    when 1
+      1
     end
   end
 
   def tableView(tableView, titleForHeaderInSection:section)
     case section
-      when 0
-        "Repository"
-      when 1
-        "Owner"
+    when 0
+      "Repository"
+    when 1
+      "Owner"
     end
   end
 
@@ -125,10 +125,11 @@ class DetailViewController < UITableViewController
     end
 
     case indexPath.section
-      when 0
+    when 0
       # Repository section
       case indexPath.row
       when 0
+        # README cell
         cell.textLabel.text = "README"
         if @manager.isGithubRepository?
           cell.detailTextLabel.text = @manager.repo
@@ -138,34 +139,18 @@ class DetailViewController < UITableViewController
           cell.userInteractionEnabled = false
         end
       when 1
+        # Issues cell
         @issuesCell = cell
         cell.textLabel.text = "Issues"
         cell.userInteractionEnabled = false
-        if @manager.isGithubRepository?
-          @manager.api.repositoryIssueCount(@manager.owner, @manager.repo, {per_page: 100}) do |count|
-            if count.is_a?(Numeric)
-              cell.userInteractionEnabled = true
-              @issuesCell.detailTextLabel.text = count.to_s
-              @issueTableViewController.viewControllers[0].tabBarItem.badgeValue = count.to_s
-            else
-              @issuesCell.detailTextLabel.text = "disable"
-            end
-          end
-          @manager.api.repositoryIssueCount(@manager.owner, @manager.repo, {per_page: 100, state: "closed"}) do |count|
-            if count.is_a?(Numeric)
-              @issueTableViewController.viewControllers[1].tabBarItem.badgeValue = count.to_s
-            end
-          end
-        else
-          cell.textColor = UIColor.grayColor
-          cell.accessoryType = UITableViewCellAccessoryNone
-        end
+        cell = self.setIssueTableViewBadge(cell)
       end
 
-      when 1
+    when 1
       # info section
       case indexPath.row
       when 0
+        # Owner cell
         cell.textLabel.text = "Owner"
         if @manager.isGithubRepositoryOrUser?
           cell.detailTextLabel.text = @manager.owner
@@ -179,9 +164,32 @@ class DetailViewController < UITableViewController
     cell
   end
 
+  def setIssueTableViewBadge(cell)
+    if @manager.isGithubRepository?
+      @manager.api.repositoryIssueCount(@manager.owner, @manager.repo, {per_page: 100}) do |count|
+        if count.is_a?(Numeric)
+          cell.userInteractionEnabled = true
+          @issuesCell.detailTextLabel.text = count.to_s
+          @issueTableViewController.viewControllers[0].tabBarItem.badgeValue = count.to_s
+        else
+          @issuesCell.detailTextLabel.text = "disable"
+        end
+      end
+      @manager.api.repositoryIssueCount(@manager.owner, @manager.repo, {per_page: 100, state: "closed"}) do |count|
+        if count.is_a?(Numeric)
+          @issueTableViewController.viewControllers[1].tabBarItem.badgeValue = count.to_s
+        end
+      end
+    else
+      cell.textColor = UIColor.grayColor
+      cell.accessoryType = UITableViewCellAccessoryNone
+    end
+    cell
+  end
+
   def tableView(tableView, didSelectRowAtIndexPath:indexPath)
     case indexPath.section
-      when 0
+    when 0
       # repositry section
       case indexPath.row
       when 0
@@ -190,7 +198,7 @@ class DetailViewController < UITableViewController
         view = @issueTableViewController
       end
 
-      when 1
+    when 1
       # info section
       case indexPath.row
       when 0
@@ -202,6 +210,7 @@ class DetailViewController < UITableViewController
       b.title = "back"
       navigationItem.backBarButtonItem = b
     end
+    
     navigationController.pushViewController(view, animated:true)
     tableView.deselectRowAtIndexPath(indexPath, animated:false)
   end

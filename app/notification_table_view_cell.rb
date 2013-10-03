@@ -15,61 +15,39 @@ class NotificationTableViewCell < AMP::SmoothTableViewCell
 
     # type
     UIColor.grayColor.setFill()
-    type = notificationType(@dataSource[:subject][:url])
-    @typeFont ||= begin
+    typeFont ||= begin
       UIFont.fontWithName("Helvetica", size:12)
     end
-    typeRect = rect;
-    typeSize = UIView.textContetSize(type, width:CONTENT_WIDTH, height:20000, font:@typeFont, lineBreakMode:NSLineBreakByWordWrapping)    
+    type = notificationType(@dataSource[:subject][:url])
+    typeSize = UIView.textContetSize(type, width:CONTENT_WIDTH, height:20000, font:typeFont, lineBreakMode:NSLineBreakByWordWrapping)
     typeRect = [[320 - typeSize.width - 35, 10], [typeSize.width, 10]]
-    "#{type}".drawInRect(typeRect, withFont:@typeFont, lineBreakMode:NSLineBreakByWordWrapping)
+    "#{type}".drawInRect(typeRect, withFont:typeFont, lineBreakMode:NSLineBreakByWordWrapping)
 
     # time
-    timeRect = rect;
+    UIColor.grayColor.setFill()
     timeRect = [[10, 10], [rect.size.width, 10]]
-    @timeFont ||= begin
+    timeFont ||= begin
       UIFont.fontWithName("Helvetica", size:12)
     end
-    inputFormatter ||=begin
-      f = NSDateFormatter.new
-      f.setTimeZone(NSTimeZone.timeZoneWithAbbreviation("GMT"))
-      f.setDateFormat("YYYY'-'MM'-'dd'T'HH':'mm':'ss'Z'")
-    end
-    outputDateFormatter ||=begin
-      f = NSDateFormatter.new
-      f.setLocale(NSLocale.systemLocale)
-      f.setTimeZone(NSTimeZone.systemTimeZone)
-      f.setDateFormat("YYYY-MM-dd")
-    end
-    outputTimeFormatter ||=begin
-      f = NSDateFormatter.new
-      f.setLocale(NSLocale.systemLocale)
-      f.setTimeZone(NSTimeZone.systemTimeZone)
-      f.setDateFormat("HH:mm:ss")
-    end
-    nsDate = inputFormatter.dateFromString(@dataSource[:updated_at])
-    date = outputDateFormatter.stringFromDate(nsDate)
-    time = outputTimeFormatter.stringFromDate(nsDate)    
-    "#{date} #{time}".drawInRect(timeRect, withFont:@timeFont, lineBreakMode:NSLineBreakByWordWrapping)
+    date = AMP::Util.dateFormatter(@dataSource[:updated_at], "YYYY'-'MM'-'dd'T'HH':'mm':'ss'Z'", "YYYY-MM-dd HH:mm:ss")
+    "#{date}".drawInRect(timeRect, withFont:timeFont, lineBreakMode:NSLineBreakByWordWrapping)
 
     # title
     UIColor.blackColor.setFill() 
-    titleRect = rect
     titleRect = [[50, 30], [CONTENT_WIDTH, 80]]
-    @titleFont ||= begin
+    titleFont ||= begin
       UIFont.fontWithName("Helvetica", size:14)
     end
-    @dataSource[:subject][:title].drawInRect(titleRect, withFont:@titleFont, lineBreakMode:NSLineBreakByWordWrapping)
+    @dataSource[:subject][:title].drawInRect(titleRect, withFont:titleFont, lineBreakMode:NSLineBreakByWordWrapping)
 
     # unread mark
     if @dataSource[:unread]
       "#000099".to_color.setFill()
-      unreadRect = rect
       unreadRect = [[15, 30], [30, 30]]
-      @unreadFont ||= begin
+      unreadFont ||= begin
         UIFont.fontWithName("Helvetica", size:18)
       end
-      "●".drawInRect(unreadRect, withFont:@unreadFont, lineBreakMode:NSLineBreakByWordWrapping)
+      "●".drawInRect(unreadRect, withFont:unreadFont, lineBreakMode:NSLineBreakByWordWrapping)
     end
     
   end

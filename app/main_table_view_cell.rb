@@ -34,6 +34,7 @@ class MainTableViewCell < AMP::SmoothTableViewCell
       @dataSource[:title].drawInRect(titleRect, withFont:titleFont, lineBreakMode:NSLineBreakByWordWrapping)
 
       # type
+      UIColor.blackColor.setFill()
       /<!--(.+?)-->/ =~ @dataSource[:content]
       type = $1.strip.gsub(/_/, " ")
       typeRect = [[10, 10], [CONTENT_WIDTH - (320 - CONTENT_WIDTH), 10]]
@@ -51,10 +52,7 @@ class MainTableViewCell < AMP::SmoothTableViewCell
       @dataSource[:time].drawInRect(timeRect, withFont:@timeFont, lineBreakMode:NSLineBreakByWordWrapping)
 
       # icon
-      # FIXME: DRY: MainTableViewController.fetchFeed()
-      # input > https://secure.gravatar.com/avatar/[:fileName]?s=30&;d=[:original image url]
       self.imageView.setImageWithURL(NSURL.URLWithString(@dataSource[:thumbnail]), placeholderImage:nil)
-      #p "title: #{@dataSource[:title]} thumb: #{@dataSource[:thumbnail]}"
     end
   end
 
