@@ -9,8 +9,8 @@ Bundler.require
 Motion::Project::App.setup do |app|
   # Use `rake config' to see complete project settings.
   app.name = "Octofeed"
-  app.version = '1.0.5'
-  app.info_plist['CFBundleShortVersionString'] = '1.0.5'
+  app.version = '1.0.6'
+  app.info_plist['CFBundleShortVersionString'] = '1.0.6'
   app.frameworks += ["MessageUI"]
   app.sdk_version = "7.0"
   app.deployment_target = "7.0"
@@ -56,5 +56,9 @@ Motion::Project::App.setup do |app|
 
   # for ios7 simulater
   #app.xcode_dir = "/Applications/Xcode5-DP6.app/Contents/Developer"
+
+  # for 64bit
+  #app.archs['iPhoneOS'] << 'arm64'
+  #app.archs['iPhoneSimulator'] << 'x86_64'
 
 end
