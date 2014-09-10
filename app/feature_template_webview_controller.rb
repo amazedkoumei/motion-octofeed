@@ -21,7 +21,6 @@ class FeatureTemplateWebViewController < UIViewController
 
     @url = url + "?mobile=0"
     navigationItem.title = navTitle
-    #navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
 
     if !@hideDoneButton
       @doneButton = UIBarButtonItem.new.tap do |b|

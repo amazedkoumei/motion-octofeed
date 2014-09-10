@@ -9,20 +9,18 @@ class DetailViewController < UITableViewController
     @manager = GithubManager.new(@url_string, self)
 
     navigationItem.title = "#{@manager.repo}"
-    navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
-
-    @doneButton = UIBarButtonItem.new.tap do |b|
-      b.initWithTitle("done", style:UIBarButtonItemStylePlain, target:self, action:"doneButton")
-      navigationItem.leftBarButtonItem = b
-    end
 
     @toolbarItems = Array.new.tap do |a|
+      @doneButton = UIBarButtonItem.new.tap do |i|
+        i.initWithBarButtonSystemItem(UIBarButtonSystemItemStop, target:self, action:'doneButton')
+      end
       @actionItem = UIBarButtonItem.new.tap do |i|
         i.initWithBarButtonSystemItem(UIBarButtonSystemItemAction, target:self, action:'actionButton')
         i.enabled = false
       end
       @flexibleSpace = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemFlexibleSpace, target:nil, action:nil)
 
+      a<<@doneButton
       a<<@flexibleSpace
       a<<@actionItem
 
@@ -33,7 +31,6 @@ class DetailViewController < UITableViewController
       v.url = "https://" + @manager.url.host + "/" + @manager.owner
       v.navTitle = "#{@manager.owner}"
       v.hideDoneButton = true
-      #v.parseBeforeDidLoad()
     end
 
     @issueTableViewController = UITabBarController.new.tap do |v|

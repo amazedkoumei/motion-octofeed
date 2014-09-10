@@ -20,12 +20,14 @@ Motion::Project::App.setup do |app|
   app.icons = ["Icon.png", "Icon@2x.png", "Icon-120.png"]
   app.prerendered_icon = false
 
+  app.env_vars = './config/app_config.yml'
+
   app.pods do
     pod "AFNetworking", "~> 1.3"
   end
 
-  if File.exists?('./config.yml')
-    config = YAML::load_file('./config.yml')
+  if File.exists?('./config/build_config.yml')
+    config = YAML::load_file('./config/build_config.yml')
 
     app.identifier = config['identifier']
     # for URL scheme
@@ -35,6 +37,8 @@ Motion::Project::App.setup do |app|
         'CFBundleURLSchemes' => ["octofeed"]
       }
     ]
+    app.info_plist["Fonts provided by application"] = "octicons.ttf"
+    app.info_plist['UIViewControllerBasedStatusBarAppearance'] = false
 
     app.development do
       app.codesign_certificate = config['development']['certificate']

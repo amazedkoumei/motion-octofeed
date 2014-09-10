@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+=begin
 module BubbleWrap
   class RSSParserForGithub < RSSParser
 
@@ -43,3 +44,4 @@ module BubbleWrap
     end
   end
 end
+=end

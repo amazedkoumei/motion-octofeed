@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+=begin
 class Github
 
   attr_reader :url, :host, :path, :userName, :repositoryName
@@ -76,3 +77,4 @@ class Github
   end
 
 end
+=end
