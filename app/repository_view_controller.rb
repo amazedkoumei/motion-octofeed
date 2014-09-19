@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-class DetailViewController < UITableViewController
+class RepsitoryViewController < UITableViewController
 
   attr_accessor :url_string, :isHaveToRefresh
   
@@ -14,23 +14,12 @@ class DetailViewController < UITableViewController
       @doneButton = UIBarButtonItem.new.tap do |i|
         i.initWithBarButtonSystemItem(UIBarButtonSystemItemStop, target:self, action:'doneButton')
       end
-      @actionItem = UIBarButtonItem.new.tap do |i|
-        i.initWithBarButtonSystemItem(UIBarButtonSystemItemAction, target:self, action:'actionButton')
-        i.enabled = false
-      end
       @flexibleSpace = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemFlexibleSpace, target:nil, action:nil)
 
       a<<@doneButton
       a<<@flexibleSpace
-      a<<@actionItem
 
       self.toolbarItems = a
-    end
-
-    @profileViewController = FeatureProfileViewController.new.tap do |v|
-      v.url = "https://" + @manager.url.host + "/" + @manager.owner
-      v.navTitle = "#{@manager.owner}"
-      v.hideDoneButton = true
     end
 
     @issueTableViewController = UITabBarController.new.tap do |v|
@@ -62,12 +51,23 @@ class DetailViewController < UITableViewController
       v.setViewControllers(viewControllers, animated:false)
     end
 
-    @readmeViewController = FeatureReadmeViewController.new.tap do |v|
-      v.url = "https://" + @manager.url.host + "/" + @manager.owner + "/" + @manager.repo
-      v.navTitle = "#{@manager.owner}/#{@manager.repo}"
-      v.hideDoneButton = true
-      v.parseBeforeDidLoad()
+    @paser = GithubPageParser.new(@manager.owner, @manager.repo)
+
+    @parseObserver = App.notification_center.observe GithubPageParser::NOTIFICATION_FINISH_LOADING do |notification|
+      @readmeViewController ||= begin
+        FeatureReadmeViewController.new.tap do |v|
+          v.url = @paser.readme_url
+          p @paser.readme_url
+          v.navTitle = "#{@manager.owner}/#{@manager.repo}"
+          v.hideDoneButton = true
+          v.parseBeforeDidLoad()
+        end
+      end
+
+      self.cell_enable(@readmeCell)
     end
+
+    @hasFinishFetch = false
   end
 
   def viewWillAppear(animated)
@@ -98,7 +98,7 @@ class DetailViewController < UITableViewController
     when 0
       2
     when 1
-      1
+      3
     end
   end
 
@@ -113,6 +113,7 @@ class DetailViewController < UITableViewController
 
   CELLID = "detailmenu"
   def tableView(tableView, cellForRowAtIndexPath:indexPath)
+=begin
     cell = tableView.dequeueReusableCellWithIdentifier(CELLID) || begin
       cell = UITableViewCell.new.tap do |c|
         c.initWithStyle(UITableViewCellStyleValue1, reuseIdentifier:CELLID)
@@ -120,9 +121,17 @@ class DetailViewController < UITableViewController
         c.accessoryType = UITableViewCellAccessoryDisclosureIndicator
       end
     end
-
+=end
     case indexPath.section
     when 0
+      cell = tableView.dequeueReusableCellWithIdentifier(CELLID) || begin
+        cell = UITableViewCell.new.tap do |c|
+          c.initWithStyle(UITableViewCellStyleValue1, reuseIdentifier:CELLID)
+          c.selectionStyle = UITableViewCellSelectionStyleBlue
+          c.accessoryType = UITableViewCellAccessoryDisclosureIndicator
+        end
+      end
+
       # Repository section
       case indexPath.row
       when 0
@@ -135,6 +144,8 @@ class DetailViewController < UITableViewController
           cell.accessoryType = UITableViewCellAccessoryNone
           cell.userInteractionEnabled = false
         end
+        self.cell_disable(cell)
+        @readmeCell = cell
       when 1
         # Issues cell
         @issuesCell = cell
@@ -147,14 +158,40 @@ class DetailViewController < UITableViewController
       # info section
       case indexPath.row
       when 0
-        # Owner cell
-        cell.textLabel.text = "Owner"
-        if @manager.isGithubRepositoryOrUser?
-          cell.detailTextLabel.text = @manager.owner
-        else
-          cell.textColor = UIColor.grayColor
-          cell.accessoryType = UITableViewCellAccessoryNone
-          cell.userInteractionEnabled = false
+        # star
+        cell = RepsitoryViewActionCell.new.tap do |c|
+          if @hasFinishFetch == true
+            if @manager.isStarredRepo
+              c.textLabel.text = "Unstar"
+            else
+              c.textLabel.text = "Star"
+            end
+          end
+          c.iconLabel.text = "\uf02a"
+        end
+      when 1
+        # wath
+        cell = RepsitoryViewActionCell.new.tap do |c|
+          if @hasFinishFetch == true
+            if @manager.isWatchingRepo
+              c.textLabel.text = "Unwatch"
+            else
+              c.textLabel.text = "Watch"
+            end
+          end
+          c.iconLabel.text = "\uf04e"
+        end
+      when 2
+        # follow
+        cell = RepsitoryViewActionCell.new.tap do |c|
+          if @hasFinishFetch == true
+            if @manager.isFollowingUser
+              c.textLabel.text = "Unfollow"
+            else
+              c.textLabel.text = "Follow"
+            end
+          end
+          c.iconLabel.text = "\uf018"
         end
       end
     end
@@ -199,7 +236,23 @@ class DetailViewController < UITableViewController
       # info section
       case indexPath.row
       when 0
-        view = @profileViewController
+        if @manager.isStarredRepo
+          self.tapActionCell("unstarRepository", "Removing Star...")
+        else
+          self.tapActionCell("starRepository", "Adding Star...")
+        end
+      when 1
+        if @manager.isWatchingRepo
+          self.tapActionCell("unwatchRepository", "Stop Watching...")
+        else
+          self.tapActionCell("watchRepository", "Start Watching...")
+        end
+      when 2
+        if @manager.isFollowingUser
+          self.tapActionCell("unfollowUser", "Stop Following...")
+        else
+          self.tapActionCell("followUser", "Start Following...")
+        end
       end
     end
 
@@ -212,51 +265,28 @@ class DetailViewController < UITableViewController
     tableView.deselectRowAtIndexPath(indexPath, animated:false)
   end
 
-  def actionButton
-    @activityController = AMP::ActivityViewController.new.tap do |a|
-
-      #TODO: set html's title to text the case of gist
-      activityItems = [@manager.url, "#{@manager.path} - Github"];
-
-      includeActivities = Array.new.tap do |arr|
-        
-        authToken = @manager.authToken
-
-        arr<<AMP::ActivityViewController.activityOpenInSafariActivity()
-        arr<<AMP::ActivityViewController.activityHatenaBookmark(@manager.url.absoluteString, {:backurl => "octofeed:/", :backtitle => "octofeed"})
-
-        if @manager.isGithubRepository?
-
-          #TODO: display always after fixed that setting title to text the case of gist
-          arr<<UIActivityTypePostToTwitter
-          arr<<UIActivityTypeMail
-
-          if @manager.isStarredRepo
-            arr<<AMP::ActivityViewController.activityGithubAPI_StarDelete(authToken, self)
-          else
-            arr<<AMP::ActivityViewController.activityGithubAPI_StarPut(authToken, self)
-          end
-
-          if @manager.isWatchingRepo
-            arr<<AMP::ActivityViewController.activityGithubAPI_WatchDelete(authToken, self)
-          else
-            arr<<AMP::ActivityViewController.activityGithubAPI_WatchPut(authToken, self)
-          end
-        end
-
-        if @manager.isGithubRepositoryOrUser?
-          if @manager.isFollowingUser
-            arr<<AMP::ActivityViewController.activityGithubAPI_FollowDelete(authToken, self)
-          else
-            arr<<AMP::ActivityViewController.activityGithubAPI_FollowPut(authToken, self)
-          end
-        end
-
+  def tapActionCell(method, message)
+    AMP::InformView.show(message, target:self.view, animated:true)
+    if method == "followUser" || method == "unfollowUser"
+      @manager.api.send(method, @manager.owner) do |ret|
+        if ret == true
+          completeGithubPerformActivity()
+        else
+          AMP::InformView.hide(true)
+          App.alert("Error")
+        end 
       end
-
-      a.initWithActivityItems(activityItems, applicationActivities:includeActivities)
-      presentViewController(a, animated:true, completion:nil)
+    else
+      @manager.api.send(method, @manager.owner, @manager.repo) do |ret|
+        if ret == true
+          completeGithubPerformActivity()
+        else
+          AMP::InformView.hide(true)
+          App.alert("Error")
+        end 
+      end
     end
+    tableView.reloadData
   end
 
   def doneButton
@@ -265,13 +295,11 @@ class DetailViewController < UITableViewController
 
   # GithubManager delegate
   def githubFetchDidFinish()
-    if @manager.isGithubRepositoryOrUser?
-      @actionItem.enabled = true
-    end
+    @hasFinishFetch = true
+    tableView.reloadData
   end
 
   def prepareGithubPerformActivity(activity)
-    @actionItem.enabled = false
     AMP::InformView.show(activity.informationMessage(), target:view, animated:true)
   end
 
@@ -280,7 +308,6 @@ class DetailViewController < UITableViewController
     AMP::InformView.hide(true)
     @manager.fetchGithubStatus()
     App.alert("Success")
-    @actionItem.enabled = true
   end
 
   # GithubApiTemplateActivity delegate
@@ -305,4 +332,15 @@ class DetailViewController < UITableViewController
     end
     @actionItem.enabled = true
   end
+
+  def cell_disable(cell)
+    cell.userInteractionEnabled = false
+    cell.textLabel.enabled = false
+  end
+
+  def cell_enable(cell)
+    cell.userInteractionEnabled = true
+    cell.textLabel.enabled = true
+  end
+
 end

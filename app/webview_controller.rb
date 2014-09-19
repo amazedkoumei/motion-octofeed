@@ -103,12 +103,12 @@ class WebViewController < UIViewController
   end
 
   def infoButton()
-    @detailView = DetailViewController.new.tap do |v|
+    @repositoryView = RepsitoryViewController.new.tap do |v|
       v.initWithStyle(UITableViewStyleGrouped)
       v.url_string = @webview.stringByEvaluatingJavaScriptFromString("document.URL")
       v.hidesBottomBarWhenPushed = true
     end
-    navigationView = UINavigationController.alloc.initWithRootViewController(@detailView)
+    navigationView = UINavigationController.alloc.initWithRootViewController(@repositoryView)
     presentViewController(navigationView, animated:true, completion:nil)
   end
 

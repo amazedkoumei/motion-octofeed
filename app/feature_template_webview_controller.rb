@@ -9,7 +9,7 @@ class FeatureTemplateWebViewController < UIViewController
   end
 
   def parseBeforeDidLoad()
-    @url = url + "?mobile=0"
+    @url = url
     @parsingWebview = UIWebView.new.tap do |v|
       v.loadRequest(NSURLRequest.requestWithURL(NSURL.URLWithString(@url)))
       v.delegate = self
@@ -19,7 +19,7 @@ class FeatureTemplateWebViewController < UIViewController
   def viewDidLoad()
     super
 
-    @url = url + "?mobile=0"
+    @url = url
     navigationItem.title = navTitle
 
     if !@hideDoneButton
@@ -94,7 +94,7 @@ class FeatureTemplateWebViewController < UIViewController
   def webView(webView, didFailLoadWithError:error)
     UIApplication.sharedApplication.networkActivityIndicatorVisible = false
     if error.code != NSURLErrorCancelled
-      App.alert($BAD_INTERNET_ACCESS_MESSAGE_FOR_WEBVIEW)
+      App.alert("#{$BAD_INTERNET_ACCESS_MESSAGE_FOR_WEBVIEW} #{error.code}")
     else
       # skip alert message when
       # called viewDidLoad() before parseBeforeDidLoad() has finished
@@ -102,6 +102,7 @@ class FeatureTemplateWebViewController < UIViewController
   end
 
   def featureElement(webView)
+    self.load_jquery(webView)
     preHtml = <<-EOS
 <html>
 <head>
@@ -133,10 +134,18 @@ a {
 </body>
 </html>
       EOS
+    #if @content.nil? || @content == ""
     if @content.nil?
       @content = webView.stringByEvaluatingJavaScriptFromString(javaScript)
     end
     preHtml + @content + postHtml
+  end
+
+  def load_jquery(webView)
+    path = NSBundle.mainBundle.pathForResource("jquery-2.1.1.min", ofType:"js")
+    jsCode = NSString.stringWithContentsOfFile(path, encoding:NSUTF8StringEncoding, error:nil)
+    webView.stringByEvaluatingJavaScriptFromString(jsCode)
+    webView
   end
 
   def doneButtonTap
