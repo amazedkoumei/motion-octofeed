@@ -7,8 +7,8 @@ GIT
 
 GIT
   remote: https://github.com/amazedkoumei/am-motion-parts.git
-  revision: 603d4c5d7eb11c72b7034c3c85e7bdd10700531c
-  ref: 603d4c5
+  revision: edf4df40249ae580baf6ca108c7edc85f98c277c
+  ref: edf4df4
   submodules: true
   specs:
     am-motion-parts (0.0.1)

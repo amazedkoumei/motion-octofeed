@@ -21,9 +21,9 @@ class SettingGithubAccountViewController < UIViewController
   def webView(webView, shouldStartLoadWithRequest:request, navigationType:navigationType)
     white_list = [
       "https://github.com/login",
-      "https://github.com/session"
+      "https://github.com/session",
+      "https://github.com/logout"
     ]
-    
     if request.URL.absoluteString == "https://github.com/"
       self.authnication()
       false
@@ -70,6 +70,8 @@ class SettingGithubAccountViewController < UIViewController
         self.navigationController.popViewControllerAnimated(true)
       else
         AMP::InformView.hide(true)
+        url = NSURL.URLWithString("https://github.com/logout")
+        @webview.loadRequest(NSURLRequest.requestWithURL(url))
         authErrorAction()
       end
     end

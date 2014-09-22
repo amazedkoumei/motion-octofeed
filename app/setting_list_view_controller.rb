@@ -125,7 +125,10 @@ class SettingListViewController < UITableViewController
         break
       end
     end
-    logged_in
+
+    @manager = GithubManager.new(nil, self)
+
+    logged_in && !@manager.authToken.nil?
   end
 
   def cell_disable(cell)

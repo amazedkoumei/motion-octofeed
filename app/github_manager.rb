@@ -53,7 +53,7 @@ class GithubManager
   end
 
   def authToken
-    App::Persistence[AMP::GithubAPI::USER_DEFAULT_AUTHTOKEN]
+    @api.authToken
   end
 
   def urlToOwnerAndRepo(url)
