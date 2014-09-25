@@ -7,6 +7,8 @@ class RepsitoryViewController < UITableViewController
     super
 
     @manager = GithubManager.new(@url_string, self)
+    @paser = GithubPageParser.new(@manager.owner, @manager.repo)
+    @hasFinishFetch = false
 
     navigationItem.title = "#{@manager.repo}"
 
@@ -51,7 +53,11 @@ class RepsitoryViewController < UITableViewController
       v.setViewControllers(viewControllers, animated:false)
     end
 
-    @paser = GithubPageParser.new(@manager.owner, @manager.repo)
+  end
+
+  def viewWillAppear(animated)
+    super
+    navigationController.setToolbarHidden(false, animated:true)
 
     @parseObserver = App.notification_center.observe GithubPageParser::NOTIFICATION_FINISH_LOADING do |notification|
       @readmeViewController ||= begin
@@ -65,16 +71,6 @@ class RepsitoryViewController < UITableViewController
       end
 
       self.cell_enable(@readmeCell)
-    end
-
-    @hasFinishFetch = false
-  end
-
-  def viewWillAppear(animated)
-    super
-    navigationController.setToolbarHidden(false, animated:true)
-    @managerErrorObserver = App.notification_center.observe GithubManager::ERROR_NOTIFICATION do |notification|
-      GithubManager.showAccountSettingViewController(self)
     end
   end
 
@@ -144,7 +140,11 @@ class RepsitoryViewController < UITableViewController
           cell.accessoryType = UITableViewCellAccessoryNone
           cell.userInteractionEnabled = false
         end
-        self.cell_disable(cell)
+
+        if @readmeViewController.nil?
+          self.cell_disable(cell)
+        end
+        
         @readmeCell = cell
       when 1
         # Issues cell
