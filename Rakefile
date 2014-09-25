@@ -43,6 +43,7 @@ Motion::Project::App.setup do |app|
     app.development do
       app.codesign_certificate = config['development']['certificate']
       app.provisioning_profile = config['development']['provisioning']
+      app.seed_id = config['development']['seed_id']
 
       app.testflight.sdk = 'vendor/TestFlight'
       app.testflight.api_token = config['testflight']['api_token']
@@ -57,6 +58,10 @@ Motion::Project::App.setup do |app|
       app.seed_id = config['release']['seed_id']
     end
   end
+
+  # To access the keychain
+  p [ app.seed_id + '.' + app.identifier ]
+  app.entitlements['keychain-access-groups'] = [ app.seed_id + '.' + app.identifier ]
 
   # for ios7 simulater
   #app.xcode_dir = "/Applications/Xcode5-DP6.app/Contents/Developer"
