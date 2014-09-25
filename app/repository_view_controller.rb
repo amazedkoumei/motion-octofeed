@@ -26,27 +26,21 @@ class RepsitoryViewController < UITableViewController
 
     @issueTableViewController = UITabBarController.new.tap do |v|
       viewControllers = [
-        UINavigationController.new.tap do |nv|
-          IssueTableViewController.new.tap do |sv|
-            # display open issue
-            sv.manager = @manager
-            sv.tabBarItem = UITabBarItem.new.tap do |ti|
-              image = AMP::Util.imageForRetina(UIImage.imageNamed("tabbar_open.png"))            
-              ti.initWithTitle("Open", image:image, tag:0)
-            end
-            nv.initWithRootViewController(sv)
+        IssueTableViewController.new.tap do |sv|
+          # display open issue
+          sv.manager = @manager
+          sv.tabBarItem = UITabBarItem.new.tap do |ti|
+            image = AMP::Util.imageForRetina(UIImage.imageNamed("tabbar_open.png"))            
+            ti.initWithTitle("Open", image:image, tag:0)
           end
         end,
-        UINavigationController.new.tap do |nv|
-          IssueTableViewController.new.tap do |sv|
-            # display closed issue
-            sv.manager = @manager
-            sv.state = "closed"
-            sv.tabBarItem = UITabBarItem.new.tap do |ti|
-              image = AMP::Util.imageForRetina(UIImage.imageNamed("tabbar_close.png"))            
-              ti.initWithTitle("Closed", image:image, tag:1)
-            end
-            nv.initWithRootViewController(sv)
+        IssueTableViewController.new.tap do |sv|
+          # display closed issue
+          sv.manager = @manager
+          sv.state = "closed"
+          sv.tabBarItem = UITabBarItem.new.tap do |ti|
+            image = AMP::Util.imageForRetina(UIImage.imageNamed("tabbar_close.png"))            
+            ti.initWithTitle("Closed", image:image, tag:1)
           end
         end
       ]
@@ -255,11 +249,6 @@ class RepsitoryViewController < UITableViewController
       end
     end
 
-    backButton = UIBarButtonItem.new.tap do |b|
-      b.title = "back"
-      navigationItem.backBarButtonItem = b
-    end
-    
     navigationController.pushViewController(view, animated:true)
     tableView.deselectRowAtIndexPath(indexPath, animated:false)
   end

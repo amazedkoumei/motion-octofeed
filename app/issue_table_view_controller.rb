@@ -75,10 +75,7 @@ class IssueTableViewController < UITableViewController
       v.manager = @manager
       v.issue = @json[indexPath.row]
     end
-    backButton = UIBarButtonItem.new.tap do |b|
-      b.title = "issues"
-      tabBarController.navigationItem.backBarButtonItem = b
-    end    
+
     navigationController.pushViewController(@detailView, animated:true)
     tableView.deselectRowAtIndexPath(indexPath, animated:false)
   end
@@ -91,7 +88,6 @@ class IssueTableViewController < UITableViewController
   def refresh()
     begin
       #@informView.showWithAnimation(false)
-      AMP::InformView.show("loading..", target:navigationController.view, animated:true)
       payload = {
         per_page: 100
       }
@@ -114,8 +110,6 @@ class IssueTableViewController < UITableViewController
     if @refreshControl.isRefreshing == true
       @refreshControl.endRefreshing()
     end
-    #@informView.hideWithAnimation(true)
-    AMP::InformView.hide(true)
   end
 
 end
