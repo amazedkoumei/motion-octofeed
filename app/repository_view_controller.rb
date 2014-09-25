@@ -63,7 +63,6 @@ class RepsitoryViewController < UITableViewController
       @readmeViewController ||= begin
         FeatureReadmeViewController.new.tap do |v|
           v.url = @paser.readme_url
-          p @paser.readme_url
           v.navTitle = "#{@manager.owner}/#{@manager.repo}"
           v.hideDoneButton = true
           v.parseBeforeDidLoad()
@@ -144,7 +143,7 @@ class RepsitoryViewController < UITableViewController
         if @readmeViewController.nil?
           self.cell_disable(cell)
         end
-        
+
         @readmeCell = cell
       when 1
         # Issues cell
