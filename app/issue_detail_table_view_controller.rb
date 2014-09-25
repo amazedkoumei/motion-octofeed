@@ -30,10 +30,6 @@ class IssueDetailTableViewController < UITableViewController
     App.notification_center.unobserve @managerErrorObserver
   end
 
-  def viewDidDisappear(animated)
-    AMP::InformView.hide(false)
-  end
-
   def numberOfSectionsInTableView(tableView)
     2
   end

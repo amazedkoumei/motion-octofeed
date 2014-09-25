@@ -27,7 +27,7 @@ class SettingListViewController < UITableViewController
 
   def viewDidAppear(animated)
     super
-    
+    self.navigationItem.backBarButtonItem = BW::UIBarButtonItem.styled(:plain, "")
     @moveTo = moveTo
     if !@moveTo.nil?
       tableView(tableView, didSelectRowAtIndexPath:NSIndexPath.indexPathForRow(@moveTo, inSection:0))

@@ -33,8 +33,9 @@ class IssueTableViewController < UITableViewController
     App.notification_center.unobserve @managerErrorObserver
   end
 
-  def viewDidDisappear(animated)
-    AMP::InformView.hide(false)
+  def viewDidAppear(animated)
+    super
+    self.tabBarController.navigationItem.backBarButtonItem = BW::UIBarButtonItem.styled(:plain, "")
   end
 
   def numberOfSectionsInTableView(tableView)

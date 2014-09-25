@@ -69,6 +69,7 @@ class RepsitoryViewController < UITableViewController
 
   def viewDidAppear(animated)
     super
+    self.navigationItem.backBarButtonItem = BW::UIBarButtonItem.styled(:plain, "")
     @manager.fetchGithubStatus()
   end
 

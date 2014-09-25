@@ -27,7 +27,6 @@ class AppDelegate
       NSForegroundColorAttributeName => UIColor.whiteColor
     }
 
-    UIBarButtonItem.appearance.setBackButtonTitlePositionAdjustment(UIOffsetMake(-1000, -1000), forBarMetrics:UIBarMetricsDefault)
   end
 
 end
