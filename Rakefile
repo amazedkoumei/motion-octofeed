@@ -60,7 +60,6 @@ Motion::Project::App.setup do |app|
   end
 
   # To access the keychain
-  p [ app.seed_id + '.' + app.identifier ]
   app.entitlements['keychain-access-groups'] = [ app.seed_id + '.' + app.identifier ]
 
   # for ios7 simulater

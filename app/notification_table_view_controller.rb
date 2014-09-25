@@ -166,9 +166,6 @@ class NotificationTableViewController < UITableViewController
         @footerView.stopAnimating
         finishRefresh()
         @is_paginating = false
-        p "finish pagenate"
-      else
-        p "response error"
       end
     end
   end
