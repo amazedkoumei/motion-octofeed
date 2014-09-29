@@ -2,14 +2,34 @@
 class IssueTableViewController < UITableViewController
   
   attr_accessor :manager
-  attr_accessor :state  # "open" or "closed". if nil, "open"
+  attr_accessor :state  # "open" or "closed".
+
+  STATE_OPEN = "open"
+  STATE_CLOSED = "closed"
 
   def viewDidLoad()
     super
     
     view.dataSource = view.delegate = self
-    navigationItem.title = "issues/#{@manager.repo}" unless navigationItem.nil?
-    tabBarController.title = "issues/#{@manager.repo}" unless tabBarController.nil?
+    navigationItem.title = "#{self.state.capitalize} Issues"
+    navigationItem.setHidesBackButton(true)
+    navigationItem.backBarButtonItem = BW::UIBarButtonItem.styled(:plain, "")
+
+    @toolbarItems = Array.new.tap do |a|
+      @doneButton = UIBarButtonItem.new.tap do |i|
+        i.initWithBarButtonSystemItem(UIBarButtonSystemItemStop, target:self, action:'doneButton')
+      end
+      @turnButton = UIBarButtonItem.new.tap do |i|
+        i.initWithTitle(self.turnState(), style:UIBarButtonItemStylePlain, target:self, action:'turnView')
+      end
+      @flexibleSpace = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemFlexibleSpace, target:nil, action:nil)
+
+      a<<@doneButton
+      a<<@flexibleSpace
+      a<<@turnButton
+
+      self.toolbarItems = a
+    end
 
     @refreshControl = UIRefreshControl.new.tap do |r|
       r.attributedTitle = NSAttributedString.alloc.initWithString("now refreshing...")
@@ -20,7 +40,7 @@ class IssueTableViewController < UITableViewController
 
   def viewWillAppear(animated)
     super
-    navigationController.setToolbarHidden(true, animated:false)
+    navigationController.setToolbarHidden(false, animated:animated)
     App.notification_center.unobserve @managerErrorObserver
     @managerErrorObserver = App.notification_center.observe GithubManager::ERROR_NOTIFICATION do |notification|
       GithubManager.showAccountSettingViewController(self)
@@ -31,11 +51,6 @@ class IssueTableViewController < UITableViewController
   def viewWillDisappear(animated)
     super
     App.notification_center.unobserve @managerErrorObserver
-  end
-
-  def viewDidAppear(animated)
-    super
-    self.tabBarController.navigationItem.backBarButtonItem = BW::UIBarButtonItem.styled(:plain, "")
   end
 
   def numberOfSectionsInTableView(tableView)
@@ -86,6 +101,32 @@ class IssueTableViewController < UITableViewController
     IssueTableViewCell.contentHeight(issue[:title])
   end
 
+  def turnView()
+    IssueTableViewController.new.tap do |sv|
+      # display open issue
+      sv.manager = @manager
+      sv.state = self.turnState()
+      sv.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal
+
+      UIView.beginAnimations(nil, context:nil)
+      UIView.setAnimationCurve(UIViewAnimationCurveEaseInOut)
+      UIView.setAnimationDuration(0.75)
+      navigationController.pushViewController(sv, animated:false)    
+      UIView.setAnimationTransition(UIViewAnimationTransitionFlipFromRight, forView:self.navigationController.view, cache:false)
+      UIView.commitAnimations
+    end
+  end
+
+  def turnState()
+    if self.state.nil?
+      STATE_CLOSED
+    elsif self.state == STATE_OPEN
+      STATE_CLOSED
+    elsif self.state == STATE_CLOSED
+      STATE_OPEN
+    end
+  end
+
   def refresh()
     begin
       #@informView.showWithAnimation(false)
@@ -111,6 +152,11 @@ class IssueTableViewController < UITableViewController
     if @refreshControl.isRefreshing == true
       @refreshControl.endRefreshing()
     end
+  end
+
+  def doneButton
+    self.modalTransitionStyle = UIModalTransitionStyleCoverVertical
+    dismissViewControllerAnimated(true, completion:nil)
   end
 
 end

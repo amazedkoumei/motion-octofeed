@@ -24,29 +24,13 @@ class RepsitoryViewController < UITableViewController
       self.toolbarItems = a
     end
 
-    @issueTableViewController = UITabBarController.new.tap do |v|
-      viewControllers = [
-        IssueTableViewController.new.tap do |sv|
-          # display open issue
-          sv.manager = @manager
-          sv.tabBarItem = UITabBarItem.new.tap do |ti|
-            image = AMP::Util.imageForRetina(UIImage.imageNamed("tabbar_open.png"))            
-            ti.initWithTitle("Open", image:image, tag:0)
-          end
-        end,
-        IssueTableViewController.new.tap do |sv|
-          # display closed issue
-          sv.manager = @manager
-          sv.state = "closed"
-          sv.tabBarItem = UITabBarItem.new.tap do |ti|
-            image = AMP::Util.imageForRetina(UIImage.imageNamed("tabbar_close.png"))            
-            ti.initWithTitle("Closed", image:image, tag:1)
-          end
-        end
-      ]
-      v.setViewControllers(viewControllers, animated:false)
+    @issueTableViewController = UINavigationController.new.tap do |nc|
+      IssueTableViewController.new.tap do |vc|
+        vc.manager = @manager
+        vc.state = IssueTableViewController::STATE_OPEN
+        nc.initWithRootViewController(vc)
+      end
     end
-
   end
 
   def viewWillAppear(animated)
@@ -95,9 +79,9 @@ class RepsitoryViewController < UITableViewController
   def tableView(tableView, titleForHeaderInSection:section)
     case section
     when 0
-      "Repository"
+      "Repository Information"
     when 1
-      "Owner"
+      "Action"
     end
   end
 
@@ -118,7 +102,6 @@ class RepsitoryViewController < UITableViewController
         cell = UITableViewCell.new.tap do |c|
           c.initWithStyle(UITableViewCellStyleValue1, reuseIdentifier:CELLID)
           c.selectionStyle = UITableViewCellSelectionStyleBlue
-          c.accessoryType = UITableViewCellAccessoryDisclosureIndicator
         end
       end
 
@@ -198,14 +181,9 @@ class RepsitoryViewController < UITableViewController
         if count.is_a?(Numeric)
           cell.userInteractionEnabled = true
           @issuesCell.detailTextLabel.text = count.to_s
-          @issueTableViewController.viewControllers[0].tabBarItem.badgeValue = count.to_s
+          #@issueTableViewController.viewControllers[0].tabBarItem.badgeValue = count.to_s
         else
           @issuesCell.detailTextLabel.text = "disable"
-        end
-      end
-      @manager.api.repositoryIssueCount(@manager.owner, @manager.repo, {per_page: 100, state: "closed"}) do |count|
-        if count.is_a?(Numeric)
-          @issueTableViewController.viewControllers[1].tabBarItem.badgeValue = count.to_s
         end
       end
     else
@@ -222,8 +200,10 @@ class RepsitoryViewController < UITableViewController
       case indexPath.row
       when 0
         view = @readmeViewController
+        navigationController.pushViewController(view, animated:true)
       when 1
         view = @issueTableViewController
+        presentViewController(view, animated:true, completion:nil)
       end
 
     when 1
@@ -250,7 +230,6 @@ class RepsitoryViewController < UITableViewController
       end
     end
 
-    navigationController.pushViewController(view, animated:true)
     tableView.deselectRowAtIndexPath(indexPath, animated:false)
   end
 
