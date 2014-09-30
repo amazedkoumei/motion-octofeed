@@ -12,7 +12,7 @@ Motion::Project::App.setup do |app|
   app.version = '1.0.6'
   app.info_plist['CFBundleShortVersionString'] = '1.0.6'
   app.frameworks += ["MessageUI"]
-  app.sdk_version = "7.1"
+  app.sdk_version = "8.0"
   app.deployment_target = "7.0"
   app.device_family = [:iphone]
   app.interface_orientations = [:portrait]
