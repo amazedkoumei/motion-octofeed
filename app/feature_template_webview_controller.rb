@@ -9,7 +9,7 @@ class FeatureTemplateWebViewController < UIViewController
   end
 
   def parseBeforeDidLoad()
-    @url = url + "?mobile=0"
+    @url = url
     @parsingWebview = UIWebView.new.tap do |v|
       v.loadRequest(NSURLRequest.requestWithURL(NSURL.URLWithString(@url)))
       v.delegate = self
@@ -19,15 +19,19 @@ class FeatureTemplateWebViewController < UIViewController
   def viewDidLoad()
     super
 
-    @url = url + "?mobile=0"
+    @url = url
     navigationItem.title = navTitle
-    #navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
 
-    if !@hideDoneButton
-      @doneButton = UIBarButtonItem.new.tap do |b|
-        b.initWithBarButtonSystemItem(UIBarButtonSystemItemDone, target:self, action:"doneButtonTap")
-        navigationItem.rightBarButtonItem = b
+    @toolbarItems = Array.new.tap do |a|
+      @doneButton = UIBarButtonItem.new.tap do |i|
+        i.initWithBarButtonSystemItem(UIBarButtonSystemItemStop, target:self, action:'doneButton')
       end
+      @flexibleSpace = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemFlexibleSpace, target:nil, action:nil)
+
+      a<<@doneButton
+      a<<@flexibleSpace
+
+      self.toolbarItems = a
     end
 
     if @parsingWebview.nil?
@@ -40,6 +44,7 @@ class FeatureTemplateWebViewController < UIViewController
     @displayWebview = UIWebView.new.tap do |v|
       v.frame = self.view.bounds
       v.delegate = self
+      v.scrollView.delegate = self
       view.addSubview(v)
     end
 
@@ -53,7 +58,7 @@ class FeatureTemplateWebViewController < UIViewController
   
   def viewWillAppear(animated)
     super
-    navigationController.setToolbarHidden(true, animated:true)
+    navigationController.setToolbarHidden(false, animated:true)
   end
 
   # UIWebViewDelegate
@@ -95,7 +100,7 @@ class FeatureTemplateWebViewController < UIViewController
   def webView(webView, didFailLoadWithError:error)
     UIApplication.sharedApplication.networkActivityIndicatorVisible = false
     if error.code != NSURLErrorCancelled
-      App.alert($BAD_INTERNET_ACCESS_MESSAGE_FOR_WEBVIEW)
+      App.alert("#{$BAD_INTERNET_ACCESS_MESSAGE_FOR_WEBVIEW} #{error.code}")
     else
       # skip alert message when
       # called viewDidLoad() before parseBeforeDidLoad() has finished
@@ -103,6 +108,7 @@ class FeatureTemplateWebViewController < UIViewController
   end
 
   def featureElement(webView)
+    self.load_jquery(webView)
     preHtml = <<-EOS
 <html>
 <head>
@@ -134,13 +140,32 @@ a {
 </body>
 </html>
       EOS
+    #if @content.nil? || @content == ""
     if @content.nil?
       @content = webView.stringByEvaluatingJavaScriptFromString(javaScript)
     end
     preHtml + @content + postHtml
   end
 
-  def doneButtonTap
+  def load_jquery(webView)
+    path = NSBundle.mainBundle.pathForResource("jquery-2.1.1.min", ofType:"js")
+    jsCode = NSString.stringWithContentsOfFile(path, encoding:NSUTF8StringEncoding, error:nil)
+    webView.stringByEvaluatingJavaScriptFromString(jsCode)
+    webView
+  end
+
+
+  def scrollViewDidScroll(scrollView)
+    translation = scrollView.panGestureRecognizer.translationInView(scrollView.superview)
+    if translation.y > 0
+      self.navigationController.setNavigationBarHidden(false, animated:true)
+    elsif translation.y < 0
+      self.navigationController.setNavigationBarHidden(true, animated:true)
+    end
+  end
+
+  def doneButton
     dismissViewControllerAnimated(true, completion:nil)
   end
+ 
 end

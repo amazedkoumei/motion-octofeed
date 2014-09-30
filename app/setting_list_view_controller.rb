@@ -10,25 +10,24 @@ class SettingListViewController < UITableViewController
   
   # FIXME: How to write Ruby's Constant
   def MOVE_TO_SETTING_GITHUB_ACCOUNT 
-    1
+    0
   end
 
   def viewDidLoad()
     super
-
+    
     view.dataSource = view.delegate = self
-    navigationItem.title = "Setting"
-    navigationController.navigationBar.tintColor = $NAVIGATIONBAR_COLOR
+    navigationItem.title = "Index"
+  end
 
-    @doneButton = UIBarButtonItem.new.tap do |b|
-      b.initWithTitle("done", style:UIBarButtonItemStylePlain, target:self, action:"doneButton")
-      navigationItem.rightBarButtonItem = b
-    end
+  def viewWillAppear(animated)
+    @logged_in = self.is_logged_in()
+    tableView.reloadData()
   end
 
   def viewDidAppear(animated)
     super
-    
+    self.navigationItem.backBarButtonItem = BW::UIBarButtonItem.styled(:plain, "")
     @moveTo = moveTo
     if !@moveTo.nil?
       tableView(tableView, didSelectRowAtIndexPath:NSIndexPath.indexPathForRow(@moveTo, inSection:0))
@@ -37,11 +36,29 @@ class SettingListViewController < UITableViewController
   end
 
   def numberOfSectionsInTableView(tableView)
-    sectionCount = 1
+    sectionCount = 2
   end
 
   def tableView(tableView, numberOfRowsInSection:section)
-    menus.count
+    case section
+    when 0
+      settings.count
+    when 1
+      menus.count
+    else
+      0
+    end
+  end
+
+  def tableView(tableView, titleForHeaderInSection:section)
+    case section
+    when 0
+      "Setting"
+    when 1
+      "Menu"
+    else
+      ""
+    end
   end
 
   CELLID = "menus"
@@ -53,31 +70,94 @@ class SettingListViewController < UITableViewController
 
     cell.selectionStyle = UITableViewCellSelectionStyleBlue
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator
-    cell.textLabel.text = menus[indexPath.row]
+
+    case indexPath.section
+    when 0
+      cell.textLabel.text = settings[indexPath.row]
+    when 1
+      cell.textLabel.text = menus[indexPath.row]
+      if @logged_in == true
+        self.cell_enable(cell)
+      else
+        self.cell_disable(cell)
+      end
+    end
     cell
   end
 
   def tableView(tableView, didSelectRowAtIndexPath:indexPath)
     if(indexPath.row < menus.count)
-      case indexPath.row
+      case indexPath.section
+      when 0
+        case indexPath.row
         when 0
-          @detail_controller = SettingGithubAccountViewController.new.tap do |v|
-            v.initWithStyle(UITableViewStyleGrouped)
+          if @logged_in == true
+            @detail_controller = SettingSignoutViewController.new
+          else
+            @detail_controller = SettingGithubAccountViewController.new
+          end
+        end
+      when 1
+        case indexPath.row
+        when 0
+          @detail_controller = NewsfeedTableViewController.new.tap do |v|
+          end
+        when 1
+          @detail_controller = NotificationTableViewController.new.tap do |v|
           end
         else
+        end
       end
     end
+
     navigationController.pushViewController(@detail_controller, animated:true)
     tableView.deselectRowAtIndexPath(indexPath, animated:true)
   end
 
+  def is_logged_in()
+    cookieJar = NSHTTPCookieStorage.sharedHTTPCookieStorage
+    url = NSURL.URLWithString("https://github.com")
+
+    logged_in = false
+    cookieJar.cookiesForURL(url).each do |cookie|
+      if cookie.name == "logged_in" && cookie.value == "yes"
+        logged_in = true
+        break
+      end
+    end
+
+    @manager = GithubManager.new(nil, self)
+
+    logged_in && !@manager.authToken.nil?
+  end
+
+  def cell_disable(cell)
+    cell.userInteractionEnabled = false
+    cell.textLabel.enabled = false
+  end
+
+  def cell_enable(cell)
+    cell.userInteractionEnabled = true
+    cell.textLabel.enabled = true
+  end
+
+  def settings
+    if @logged_in == true
+      @settings = [
+        "Sign out"      
+      ]
+    else
+      @settings = [
+        "Sign in"      
+      ]
+    end      
+  end
+
   def menus
     @menus = [
-      "Github Account"
+      "News Feed",
+      "Notification"
     ]
   end
 
-  def doneButton
-    dismissViewControllerAnimated(true, completion:nil)
-  end
 end

@@ -10,3 +10,6 @@ resources/*.storyboardc
 .bundle/
 bundle/
 .DS_Store
+
+config/app_config.yml
+config/build_config.yml

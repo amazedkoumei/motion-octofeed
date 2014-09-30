@@ -17,16 +17,23 @@ class WebViewController < UIViewController
     end
 
     @toolbarItems = Array.new.tap do |a|
+      @closeItem = UIBarButtonItem.new.tap do |i|
+        i.initWithBarButtonSystemItem(UIBarButtonSystemItemStop, target:self, action:'close')
+      end
+
       @backItem = UIBarButtonItem.new.tap do |i|
         i.initWithBarButtonSystemItem(101, target:@webview, action:'goBack')
         i.enabled = false
       end
+
+      @infoItem = UIBarButtonItem.new.tap do |i|
+        image = AMP::Util.imageForRetina(UIImage.imageNamed("toolbar_info.png"))
+        i.initWithImage(image, style:UIBarButtonItemStylePlain, target:self, action:"infoButton")
+      end
+
       @forwardItem = UIBarButtonItem.new.tap do |i|
         i.initWithBarButtonSystemItem(102, target:@webview, action:'goForward')
         i.enabled = false
-      end
-      @reloadItem = UIBarButtonItem.new.tap do |i|
-        i.initWithBarButtonSystemItem(UIBarButtonSystemItemRefresh, target:@webview, action:'reload')
       end
 
       @actionItem = UIBarButtonItem.new.tap do |i|
@@ -36,42 +43,52 @@ class WebViewController < UIViewController
         end
       end
 
-      @infoItem = UIBarButtonItem.new.tap do |i|
-        image = AMP::Util.imageForRetina(UIImage.imageNamed("toolbar_info.png"))
-        i.initWithImage(image, style:UIBarButtonItemStylePlain, target:self, action:"infoButton")
-      end
-
       @flexibleSpace = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemFlexibleSpace, target:nil, action:nil)
 
+      a<<@closeItem
+      a<<@flexibleSpace
       a<<@backItem
+      a<<@flexibleSpace
+      a<<@infoItem
       a<<@flexibleSpace
       a<<@forwardItem
       a<<@flexibleSpace
-      a<<@reloadItem
-      a<<@flexibleSpace
       a<<@actionItem
-      a<<@flexibleSpace
-      a<<@infoItem
 
       self.toolbarItems = a
     end
-  end
-  
-  def viewWillAppear(animated)
-    super
-    navigationController.setToolbarHidden(false, animated:true)
+
+    @refreshControl = UIRefreshControl.new.tap do |r|
+      r.tintColor = UIColor.whiteColor
+      r.addTarget(self, action:"reload", forControlEvents:UIControlEventValueChanged)
+      @webview.scrollView.addSubview(r)
+    end
+
   end
 
-  def viewWillDisappear(animated)
+  def viewDidAppear(animated)
     super
-    navigationController.setToolbarHidden(true, animated:animated)
+    unless self.navigationController.nil?
+      self.navigationController.setNavigationBarHidden(true, animated:animated)
+      self.navigationController.setToolbarHidden(false, animated:false)
+    end
+  end
+
+  def reload()
+    @webview.reload()
+    if @refreshControl.isRefreshing == true
+      @refreshControl.endRefreshing()
+    end    
+  end
+
+  def close
+    dismissViewControllerAnimated(true, completion:nil)
   end
 
   def actionButton
     @activityController = AMP::ActivityViewController.new.tap do |a|
 
       activityItems = [@manager.url, @manager.url.absoluteString];
-
 
       includeActivities = Array.new.tap do |arr|
         arr<<UIActivityTypePostToTwitter
@@ -86,12 +103,12 @@ class WebViewController < UIViewController
   end
 
   def infoButton()
-    @detailView = DetailViewController.new.tap do |v|
+    @repositoryView = RepsitoryViewController.new.tap do |v|
       v.initWithStyle(UITableViewStyleGrouped)
-      v.url_string = @webview.stringByEvaluatingJavaScriptFromString("document.URL")
+      v.url_string = @url_string
       v.hidesBottomBarWhenPushed = true
     end
-    navigationView = UINavigationController.alloc.initWithRootViewController(@detailView)
+    navigationView = UINavigationController.alloc.initWithRootViewController(@repositoryView)
     presentViewController(navigationView, animated:true, completion:nil)
   end
 
@@ -113,7 +130,6 @@ class WebViewController < UIViewController
 
   def webView(webView, didFailLoadWithError:error)
     UIApplication.sharedApplication.networkActivityIndicatorVisible = false
-    App.alert($BAD_INTERNET_ACCESS_MESSAGE_FOR_WEBVIEW)
   end
 
 end

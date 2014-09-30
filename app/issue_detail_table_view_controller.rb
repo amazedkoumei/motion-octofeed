@@ -30,10 +30,6 @@ class IssueDetailTableViewController < UITableViewController
     App.notification_center.unobserve @managerErrorObserver
   end
 
-  def viewDidDisappear(animated)
-    AMP::InformView.hide(false)
-  end
-
   def numberOfSectionsInTableView(tableView)
     2
   end
@@ -115,8 +111,6 @@ class IssueDetailTableViewController < UITableViewController
 
   def refresh()
     begin
-      AMP::InformView.show("loading..", target:navigationController.view, animated:true)
-
       @manager.api.getRepositoryIssueComment(@manager.owner, @manager.repo, @issue[:number], {per_page: 100}) do |response|
         if response.ok?
           @json = BW::JSON.parse(response.body)
@@ -134,7 +128,6 @@ class IssueDetailTableViewController < UITableViewController
     if @refreshControl.isRefreshing == true
       @refreshControl.endRefreshing()
     end
-    AMP::InformView.hide(true)
   end
 
 end

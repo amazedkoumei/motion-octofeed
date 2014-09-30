@@ -14,7 +14,11 @@ class GithubManager
   def initialize(url_string, delegate)
     @delegate = delegate
     unless url_string.nil?
-      @url_string = url_string
+      if isApiURL(url_string)
+        @url_string = self.apiURLtoHtmlURL(url_string)
+      else
+        @url_string = url_string
+      end
       @url = NSURL.URLWithString(@url_string)
       @path = @url.path.slice(1, @url.path.length - 1)
       @path = @path + "#" + @url.fragment unless @url.fragment.nil?
@@ -34,8 +38,22 @@ class GithubManager
     viewController.presentViewController(view, animated:true, completion:nil)
   end
 
+  def isApiURL(url_string)
+    url = NSURL.URLWithString(url_string)
+    url.host == "api.github.com"
+  end
+
+  # TODO: パッチ的すぐる
+  # Notifications API 戻り値 の [:subject][:json] 以外で使っちゃダメ
+  def apiURLtoHtmlURL(url_string)
+    url = NSURL.URLWithString(url_string)
+    path_array = url.path.split("/")
+    path_array.delete_at(1)
+    "http://github.com" + path_array.join("/")
+  end
+
   def authToken
-    App::Persistence[AMP::GithubAPI::USER_DEFAULT_AUTHTOKEN]
+    @api.authToken
   end
 
   def urlToOwnerAndRepo(url)
