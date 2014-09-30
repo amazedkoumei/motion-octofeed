@@ -77,6 +77,9 @@ class IssueTableViewController < UITableViewController
     cellId = issue[:id].to_s
     cell = tableView.dequeueReusableCellWithIdentifier(cellId) || begin
       cell = IssueTableViewCell.new.tap do |c|
+        width = self.tableView.frame.size.width
+        height = self.tableView(tableView, heightForRowAtIndexPath:indexPath)
+        c.frame = [[0, 0], [width, height]]
         c.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:cellId)
         c.selectionStyle = UITableViewCellSelectionStyleBlue
         c.accessoryType = UITableViewCellAccessoryDisclosureIndicator
