@@ -39,11 +39,13 @@ class RepsitoryViewController < UITableViewController
 
     @parseObserver = App.notification_center.observe GithubPageParser::NOTIFICATION_FINISH_LOADING do |notification|
       @readmeViewController ||= begin
-        FeatureReadmeViewController.new.tap do |v|
-          v.url = @paser.readme_url
-          v.navTitle = "#{@manager.owner}/#{@manager.repo}"
-          v.hideDoneButton = true
-          v.parseBeforeDidLoad()
+        UINavigationController.new.tap do |nc|
+          FeatureReadmeViewController.new.tap do |v|
+            v.url = @paser.readme_url
+            v.navTitle = "#{@manager.owner}/#{@manager.repo}"
+            v.parseBeforeDidLoad()
+            nc.initWithRootViewController(v)
+          end
         end
       end
 
@@ -200,11 +202,10 @@ class RepsitoryViewController < UITableViewController
       case indexPath.row
       when 0
         view = @readmeViewController
-        navigationController.pushViewController(view, animated:true)
       when 1
         view = @issueTableViewController
-        presentViewController(view, animated:true, completion:nil)
       end
+      presentViewController(view, animated:true, completion:nil)
 
     when 1
       # info section

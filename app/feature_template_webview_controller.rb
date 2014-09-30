@@ -22,11 +22,16 @@ class FeatureTemplateWebViewController < UIViewController
     @url = url
     navigationItem.title = navTitle
 
-    if !@hideDoneButton
-      @doneButton = UIBarButtonItem.new.tap do |b|
-        b.initWithBarButtonSystemItem(UIBarButtonSystemItemDone, target:self, action:"doneButtonTap")
-        navigationItem.rightBarButtonItem = b
+    @toolbarItems = Array.new.tap do |a|
+      @doneButton = UIBarButtonItem.new.tap do |i|
+        i.initWithBarButtonSystemItem(UIBarButtonSystemItemStop, target:self, action:'doneButton')
       end
+      @flexibleSpace = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemFlexibleSpace, target:nil, action:nil)
+
+      a<<@doneButton
+      a<<@flexibleSpace
+
+      self.toolbarItems = a
     end
 
     if @parsingWebview.nil?
@@ -39,6 +44,7 @@ class FeatureTemplateWebViewController < UIViewController
     @displayWebview = UIWebView.new.tap do |v|
       v.frame = self.view.bounds
       v.delegate = self
+      v.scrollView.delegate = self
       view.addSubview(v)
     end
 
@@ -52,7 +58,7 @@ class FeatureTemplateWebViewController < UIViewController
   
   def viewWillAppear(animated)
     super
-    navigationController.setToolbarHidden(true, animated:true)
+    navigationController.setToolbarHidden(false, animated:true)
   end
 
   # UIWebViewDelegate
@@ -148,7 +154,18 @@ a {
     webView
   end
 
-  def doneButtonTap
+
+  def scrollViewDidScroll(scrollView)
+    translation = scrollView.panGestureRecognizer.translationInView(scrollView.superview)
+    if translation.y > 0
+      self.navigationController.setNavigationBarHidden(false, animated:true)
+    elsif translation.y < 0
+      self.navigationController.setNavigationBarHidden(true, animated:true)
+    end
+  end
+
+  def doneButton
     dismissViewControllerAnimated(true, completion:nil)
   end
+ 
 end
