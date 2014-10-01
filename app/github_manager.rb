@@ -44,10 +44,15 @@ class GithubManager
   end
 
   # TODO: パッチ的すぐる
-  # Notifications API 戻り値 の [:subject][:json] 以外で使っちゃダメ
   def apiURLtoHtmlURL(url_string)
+    # 変換結果の例
+    # https://api.github.com/repos/naoya/HBFav2/issues/107
+    # → https://github.com/naoya/HBFav2/issues/107
+    # https://api.github.com/repos/naoya/HBFav2/pulls/104
+    # → https://github.com/naoya/HBFav2/pull/104
     url = NSURL.URLWithString(url_string)
     path_array = url.path.split("/")
+    path_array[4] = "pull" if path_array[4] == "pulls"
     path_array.delete_at(1)
     "http://github.com" + path_array.join("/")
   end
