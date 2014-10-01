@@ -16,11 +16,15 @@ class IssueTableViewCell < AMP::SmoothTableViewCell
     self.imageView.frame = [[10, 30], [30, 30]]
   end
 
+  def content_width
+    self.frame.size.width - 70
+  end
+
   def draw(rect)
 
     # comment
     UIColor.grayColor.setFill()
-    commentsRect = [[230, 10], [rect.size.width, 10]]
+    commentsRect = [[content_width - 20, 10], [rect.size.width, 10]]
     commentsFont ||= begin
       UIFont.fontWithName("Helvetica", size:12)
     end
@@ -37,7 +41,7 @@ class IssueTableViewCell < AMP::SmoothTableViewCell
 
     # title
     UIColor.blackColor.setFill()      
-    titleRect = [[50, 30], [CONTENT_WIDTH, 80]]
+    titleRect = [[50, 30], [content_width, 80]]
     titleFont ||= begin
       UIFont.fontWithName("Helvetica", size:14)
     end

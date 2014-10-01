@@ -8,6 +8,10 @@ class IssueDetailCommentTableViewCell < AMP::SmoothTableViewCell
     self.imageView.frame = [[10, 35], [30, 30]]
   end
 
+  def content_width
+    self.frame.size.width - 70
+  end
+
   def draw(rect)
     UIColor.grayColor.setFill()
     commentsRect = rect;
@@ -18,7 +22,7 @@ class IssueDetailCommentTableViewCell < AMP::SmoothTableViewCell
     "#{@dataSource[:user][:login]}".drawInRect(commentsRect, withFont:@commentsFont, lineBreakMode:NSLineBreakByWordWrapping)
 
     timeRect = rect;
-    timeRect = [[190, 10], [rect.size.width, 10]]
+    timeRect = [[content_width - 60, 10], [rect.size.width, 10]]
     @timeFont ||= begin
       UIFont.fontWithName("Helvetica", size:12)
     end
@@ -52,13 +56,13 @@ class IssueDetailCommentTableViewCell < AMP::SmoothTableViewCell
     titleRect.origin.x = 50
     titleRect.origin.y = 30
     titleRect.size.height = 80
-    titleRect.size.width = 250;
+    titleRect.size.width = content_width
     @titleFont ||= begin
       UIFont.fontWithName("Helvetica", size:14)
     end
 
     # adjust cell height
-    cell_content_width = 250
+    cell_content_width = content_width
     cell_content_margin = 0
     text = @dataSource[:body]
     constraint = CGSizeMake(cell_content_width - (cell_content_margin * 2), 20000);   
