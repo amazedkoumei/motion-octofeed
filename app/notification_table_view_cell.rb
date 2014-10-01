@@ -3,13 +3,16 @@ class NotificationTableViewCell < AMP::SmoothTableViewCell
 
   attr_accessor :dataSource
 
-  CONTENT_WIDTH = 230
-
   def self.contentHeight(title)
-    size = UIView.textContetSize(title, width:CONTENT_WIDTH, height:20000, font:UIFont.fontWithName("Helvetica", size:14), lineBreakMode:NSLineBreakByWordWrapping)    
+    size = UIView.textContetSize(title, width:UIScreen.mainScreen.bounds.size.width - 90, height:20000, font:UIFont.fontWithName("Helvetica", size:14), lineBreakMode:NSLineBreakByWordWrapping)    
     height = 30 + size.height + 20
     [height, 80].max
   end
+
+  def content_width
+    self.frame.size.width - 70
+  end
+
 
   def draw(rect)
 
@@ -19,8 +22,8 @@ class NotificationTableViewCell < AMP::SmoothTableViewCell
       UIFont.fontWithName("Helvetica", size:12)
     end
     type = notificationType(@dataSource[:subject][:url])
-    typeSize = UIView.textContetSize(type, width:CONTENT_WIDTH, height:20000, font:typeFont, lineBreakMode:NSLineBreakByWordWrapping)
-    typeRect = [[320 - typeSize.width - 35, 10], [typeSize.width, 10]]
+    typeSize = UIView.textContetSize(type, width:content_width, height:20000, font:typeFont, lineBreakMode:NSLineBreakByWordWrapping)
+    typeRect = [[content_width - 10, 10], [typeSize.width, 10]]
     "#{type}".drawInRect(typeRect, withFont:typeFont, lineBreakMode:NSLineBreakByWordWrapping)
 
     # time
@@ -34,7 +37,7 @@ class NotificationTableViewCell < AMP::SmoothTableViewCell
 
     # title
     UIColor.blackColor.setFill() 
-    titleRect = [[50, 30], [CONTENT_WIDTH, 80]]
+    titleRect = [[50, 30], [content_width, 80]]
     titleFont ||= begin
       UIFont.fontWithName("Helvetica", size:14)
     end

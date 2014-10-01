@@ -8,9 +8,10 @@ Bundler.require
 
 Motion::Project::App.setup do |app|
   # Use `rake config' to see complete project settings.
+  version = "1.1.1"
   app.name = "Octofeed"
-  app.version = '1.0.6'
-  app.info_plist['CFBundleShortVersionString'] = '1.0.6'
+  app.version = version
+  app.info_plist['CFBundleShortVersionString'] = version
   app.frameworks += ["MessageUI"]
   app.sdk_version = "8.0"
   app.deployment_target = "7.0"
@@ -39,6 +40,29 @@ Motion::Project::App.setup do |app|
     ]
     app.info_plist["Fonts provided by application"] = "octicons.ttf"
     app.info_plist['UIViewControllerBasedStatusBarAppearance'] = false
+
+    # http://hipbyte.myjetbrains.com/youtrack/issue/RM-596
+    # https://github.com/naoya/HBFav2/pull/109
+    app.info_plist["UILaunchImages"] = [
+      {
+        "UILaunchImageMinimumOSVersion" => "8.0",
+        "UILaunchImageName" => "Default-736h@3x",
+        "UILaunchImageOrientation" => "Portrait",
+        "UILaunchImageSize" => "{414, 736}"
+      },      
+      {
+        "UILaunchImageMinimumOSVersion" => "8.0",
+        "UILaunchImageName" => "Default-667h@2x",
+        "UILaunchImageOrientation" => "Portrait",
+        "UILaunchImageSize" => "{375, 667}"
+      },
+      {
+        "UILaunchImageMinimumOSVersion" => "6.0",
+        "UILaunchImageName" => "Default-568h@2x",
+        "UILaunchImageOrientation" => "Portrait",
+        "UILaunchImageSize" => "{320, 568}"
+      }
+    ]
 
     app.development do
       app.codesign_certificate = config['development']['certificate']

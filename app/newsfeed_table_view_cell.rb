@@ -3,8 +3,6 @@ class NewsfeedTableViewCell < AMP::SmoothTableViewCell
 
   attr_accessor :dataSource
 
-  CONTENT_WIDTH = 250
-
   def self.contentHeight(title)
     # 文字列を受けとって高さを計算するのが一般的
     # なので引数はうけとる形にしておく
@@ -28,6 +26,10 @@ class NewsfeedTableViewCell < AMP::SmoothTableViewCell
     end
   end
 
+  def content_width
+    self.frame.size.width - 70
+  end
+
   def draw(rect)
     if(!@dataSource.nil?)
 
@@ -37,16 +39,16 @@ class NewsfeedTableViewCell < AMP::SmoothTableViewCell
 
       origin_x = self.imageView.frame.origin.x + self.imageView.frame.size.width + 10
 
-      title1Rect = [[origin_x, 10], [CONTENT_WIDTH, 300]]
+      title1Rect = [[origin_x, 10], [content_width, 300]]
       self.drawTitle1(title1Rect)
 
-      title2Rect = [[origin_x, 30], [CONTENT_WIDTH, 300]]
+      title2Rect = [[origin_x, 30], [content_width, 300]]
       self.drawTitle2(title2Rect)
 
-      descriptionRect = [[origin_x + 30, 60], [CONTENT_WIDTH - 30, 30]]
+      descriptionRect = [[origin_x + 30, 60], [content_width - 30, 30]]
       self.drawDescription(descriptionRect)
 
-      timeRect = [[CONTENT_WIDTH, 90], [320 - CONTENT_WIDTH, 30]]
+      timeRect = [[content_width, 90], [70, 30]]
       self.drawTime(timeRect)
 
       # icon

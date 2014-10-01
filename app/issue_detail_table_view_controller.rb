@@ -58,13 +58,15 @@ class IssueDetailTableViewController < UITableViewController
 
   CELLID = "feed"
   def tableView(tableView, cellForRowAtIndexPath:indexPath)
+
+    width = self.tableView.frame.size.width
+    height = self.tableView(tableView, heightForRowAtIndexPath:indexPath)
+
     case indexPath.section
     when 0
       cellId = @issue[:id].to_s + @issue[:updated_at]
       cell = tableView.dequeueReusableCellWithIdentifier(cellId) || begin
         cell = IssueDetailTableViewCell.new.tap do |c|
-          width = self.tableView.frame.size.width
-          height = self.tableView(tableView, heightForRowAtIndexPath:indexPath)
           c.frame = [[0, 0], [width, height]]
           c.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:cellId)
           c.selectionStyle = UITableViewCellSelectionStyleBlue
@@ -77,6 +79,7 @@ class IssueDetailTableViewController < UITableViewController
       cellId = @json[indexPath.row][:id].to_s + @json[indexPath.row][:updated_at]
       cell = tableView.dequeueReusableCellWithIdentifier(cellId) || begin
         cell = IssueDetailCommentTableViewCell.new.tap do |c|
+          c.frame = [[0, 0], [width, height]]
           c.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:cellId)
           c.selectionStyle = UITableViewCellSelectionStyleBlue
           c.userInteractionEnabled = false

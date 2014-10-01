@@ -3,11 +3,15 @@ class IssueDetailTableViewCell < AMP::SmoothTableViewCell
 
   attr_accessor :dataSource
 
-  CONTENT_WIDTH = 250
+  content_width = 250
 
   def layoutSubviews()
     self.contentView.frame = self.bounds
     self.imageView.frame = [[10, 35], [30, 30]]
+  end
+
+  def content_width
+    self.frame.size.width - 70
   end
 
   def draw(rect)
@@ -22,7 +26,7 @@ class IssueDetailTableViewCell < AMP::SmoothTableViewCell
 
     # time
     UIColor.grayColor.setFill()
-    timeRect = [[190, 10], [rect.size.width - 20, 10]]
+    timeRect = [[content_width - 60, 10], [rect.size.width - 20, 10]]
     @timeFont ||= begin
       UIFont.fontWithName("Helvetica", size:12)
     end
@@ -35,9 +39,9 @@ class IssueDetailTableViewCell < AMP::SmoothTableViewCell
       UIFont.fontWithName("Helvetica", size:14)
     end
 
-    size = UIView.textContetSize(@dataSource[:body], width:CONTENT_WIDTH, height:20000, font:@titleFont, lineBreakMode:NSLineBreakByWordWrapping)    
+    size = UIView.textContetSize(@dataSource[:body], width:content_width, height:20000, font:@titleFont, lineBreakMode:NSLineBreakByWordWrapping)    
     height = [size.height, 80].max
-    titleRect = [[50, 30], [CONTENT_WIDTH, height]]
+    titleRect = [[50, 30], [content_width, height]]
 
     @dataSource[:body].drawInRect(titleRect, withFont:@titleFont, lineBreakMode:NSLineBreakByWordWrapping)
 
