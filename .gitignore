@@ -3,7 +3,6 @@ build
 vendor
 config.yml
 LiveScratchpad.rb
-app/testflight_launcher.rb
 resources/*.nib
 resources/*.momd
 resources/*.storyboardc

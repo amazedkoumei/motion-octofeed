@@ -8,12 +8,12 @@ Bundler.require
 
 Motion::Project::App.setup do |app|
   # Use `rake config' to see complete project settings.
-  version = "1.1.1"
+  version = "1.1.2"
   app.name = "Octofeed"
   app.version = version
   app.info_plist['CFBundleShortVersionString'] = version
   app.frameworks += ["MessageUI"]
-  app.sdk_version = "8.0"
+  app.sdk_version = "8.1"
   app.deployment_target = "7.0"
   app.device_family = [:iphone]
   app.interface_orientations = [:portrait]
@@ -67,19 +67,13 @@ Motion::Project::App.setup do |app|
     app.development do
       app.codesign_certificate = config['development']['certificate']
       app.provisioning_profile = config['development']['provisioning']
-      app.seed_id = config['development']['seed_id']
-
-      app.testflight.sdk = 'vendor/TestFlight'
-      app.testflight.api_token = config['testflight']['api_token']
-      app.testflight.team_token = config['testflight']['team_token']
-      if config['testflight']['provisioning']
-        app.provisioning_profile = config['testflight']['provisioning']
-      end
+      app.seed_id = config['development']['seed_id']      
     end
     app.release do
       app.codesign_certificate = config['release']['certificate']
       app.provisioning_profile = config['release']['provisioning']
       app.seed_id = config['release']['seed_id']
+      #app.entitlements['beta-reports-active'] = true
     end
   end
 
@@ -90,7 +84,7 @@ Motion::Project::App.setup do |app|
   #app.xcode_dir = "/Applications/Xcode5-DP6.app/Contents/Developer"
 
   # for 64bit
-  #app.archs['iPhoneOS'] << 'arm64'
-  #app.archs['iPhoneSimulator'] << 'x86_64'
+  app.archs['iPhoneOS'] << 'arm64'
+  app.archs['iPhoneSimulator'] << 'x86_64'
 
 end
