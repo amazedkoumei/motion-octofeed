@@ -76,7 +76,6 @@ Please Download from [here](https://itunes.apple.com/app/octofeed/id574223751 "a
 使用しているライブラリ / Using Library
 ----------
 + [BubbleWrap](https://github.com/rubymotion/BubbleWrap)
-+ [motion-testflight](https://github.com/HipByte/motion-testflight)
 + [am-motion-parts](https://github.com/amazedkoumei/am-motion-parts)
 
 
